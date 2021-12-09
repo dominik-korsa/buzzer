@@ -27,17 +27,21 @@ body {
     margin-top: -25px;
     box-sizing: border-box;
     border-radius: 10px;
-    transition: margin-top 150ms ease-out;
+    transition: margin-top 150ms ease-out, filter 200ms;
     color: #004B23;
     font-size: 16pt;
 }
 
 #connect-button:active:not(:disabled) #connect-button__top {
-    margin-top: -10px;
+    margin-top: -5px;
 }
 
 #connect-button:disabled {
     filter: grayscale(100%);
+}
+
+#connect-button:disabled #connect-button__top {
+    margin-top: -10px;
 }
 
 #big-button-wrapper {
