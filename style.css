@@ -57,13 +57,16 @@ button {
 }
 
 #big-button {
+    --top-center-color: #AB2121;
+    --top-edge-color: #9A1D1D;
+    --body-color: #891A1A;
     display: flex;
     flex-direction: column-reverse;
     width: min(50vw, 50vh);
     height: min(50vw, 50vh);
     border: 8px solid #5A5A66;
     border-radius: 50%;
-    background: #E03800;
+    background: var(--body-color);
     padding: 0;
     cursor: pointer;
     box-sizing: content-box;
@@ -74,9 +77,8 @@ button {
     --size: min(50vw, 50vh);
     width: var(--size);
     height: var(--size);
-    background-color: #FF4000;
+    background: radial-gradient(circle, var(--top-center-color) 0%, var(--top-center-color) 60%, var(--top-edge-color) 72%);
     border-radius: 50%;
-    border: 5px solid #F53D00;
     box-sizing: border-box;
     margin-bottom: -50%;
     margin-top: -50%;
@@ -84,7 +86,7 @@ button {
 }
 
 #big-button__body {
-    background: #E03800;
+    background: var(--body-color);
     height: 25px;
     width: 100%;
     transition: height 150ms ease-out;
