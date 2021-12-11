@@ -10,10 +10,17 @@ button {
     -webkit-tap-highlight-color: transparent;
 }
 
+#controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 32px;
+    margin-bottom: 8px;
+}
+
 #connect-button {
     height: 48px;
     background: #008000;
-    margin: 32px auto 8px;
     min-width: 128px;
     border: none;
     padding: 0;
