@@ -11,9 +11,12 @@ player.addEventListener('ended', () => {
     bigButton.classList.remove('big-button--pressed');
 });
 
+let device;
+
 async function connect() {
+    console.log('Connecting...');
     try {
-        const device = await navigator.bluetooth.requestDevice({
+        device = device ?? await navigator.bluetooth.requestDevice({
             filters: [{services: [parseInt('0xFFE0')]}]
         });
         if (device === null) {
@@ -34,6 +37,8 @@ async function connect() {
     }
 }
 
-function onDisconnect() {
+async function onDisconnect() {
     connectButton.disabled = false;
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await connect();
 }
