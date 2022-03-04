@@ -18,10 +18,10 @@ player.addEventListener('ended', () => {
 
 let device;
 
-async function connect() {
+async function connect(force) {
     console.log('Connecting...');
     try {
-        device = device ?? await navigator.bluetooth.requestDevice({
+        if (force || !device) device = await navigator.bluetooth.requestDevice({
             filters: [{services: [parseInt('0xFFE0')]}]
         });
         if (device === null) {
@@ -44,6 +44,6 @@ async function connect() {
 
 async function onDisconnect() {
     connectButton.disabled = false;
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    await connect();
+    await new Promise((resolve) => setTimeout(resolve, 2500));
+    await connect(false);
 }
