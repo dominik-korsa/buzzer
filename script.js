@@ -2,7 +2,12 @@ const connectButton = document.getElementById('connect-button');
 const bigButton = document.getElementById('big-button');
 const player = document.getElementById('player');
 
-bigButton.addEventListener('click', () => player.play());
+function playSound() {
+    player.currentTime = 0;
+    player.play();
+}
+
+bigButton.addEventListener('click', () => playSound());
 
 player.addEventListener('play', () => {
     bigButton.classList.add('big-button--pressed');
@@ -31,7 +36,7 @@ async function connect() {
         connectButton.disabled = true;
 
         console.log('> Notifications started');
-        characteristic.addEventListener('characteristicvaluechanged', () => player.play());
+        characteristic.addEventListener('characteristicvaluechanged', () => playSound());
     } catch (error) {
         console.error(error);
     }
