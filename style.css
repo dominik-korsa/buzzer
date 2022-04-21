@@ -111,7 +111,13 @@ button {
 }
 
 #audio-select {
-    width: 200px;
+    min-width: 200px;
     align-self: center;
     margin: 20px;
+    padding: 5px;
+    border-radius: 10px;
+    background: #6290BC;
+    border: #497CAB 4px solid;
+    color: #1F3447;
+    font-size: 12pt;
 }
