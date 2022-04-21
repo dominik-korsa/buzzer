@@ -109,3 +109,9 @@ button {
 #big-button:active #big-button__body {
     height: 5px;
 }
+
+#audio-select {
+    width: 200px;
+    align-self: center;
+    margin: 20px;
+}

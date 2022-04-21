@@ -10,7 +10,7 @@
     <link href="style.css" rel="stylesheet">
 </head>
 <body>
-<audio src="sound.mp3" id="player"></audio>
+<audio id="player"></audio>
 <div id="controls">
     <button onclick="connect(true)" id="connect-button">
         <span id="connect-button__top">
@@ -24,5 +24,9 @@
         <span id="big-button__top"></span>
     </button>
 </div>
+<select id="audio-select">
+    <option value="buzzer" selected>Buzzer</option>
+    <option value="emergency-meeting">Emergency meeting</option>
+</select>
 </body>
 </html>

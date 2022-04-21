@@ -1,6 +1,18 @@
 const connectButton = document.getElementById('connect-button');
 const bigButton = document.getElementById('big-button');
 const player = document.getElementById('player');
+const audioSelect = document.getElementById('audio-select');
+
+function updateSrc() {
+    player.src = `sounds/${audioSelect.value}.mp3`;
+}
+
+audioSelect.value = localStorage.getItem('buzzer-sound') || 'buzzer';
+updateSrc();
+audioSelect.addEventListener('change', () => {
+    updateSrc();
+    localStorage.setItem('buzzer-sound', audioSelect.value);
+});
 
 function playSound() {
     player.currentTime = 0;
