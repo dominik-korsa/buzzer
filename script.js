@@ -29,6 +29,7 @@ player.addEventListener('ended', () => {
 });
 
 let device;
+let wakeLock = null;
 
 async function connect(force) {
     console.log('Connecting...');
@@ -46,6 +47,11 @@ async function connect(force) {
         const characteristic = await service.getCharacteristic(0xFFE1);
         await characteristic.startNotifications();
         connectButton.disabled = true;
+        try {
+            wakeLock = await navigator.wakeLock.request('screen');
+        } catch (err) {
+            console.warn('Failed to request wake lock', err);
+        }
 
         console.log('> Notifications started');
         characteristic.addEventListener('characteristicvaluechanged', () => playSound());
@@ -55,6 +61,8 @@ async function connect(force) {
 }
 
 async function onDisconnect() {
+    wakeLock?.release();
+    wakeLock = null;
     connectButton.disabled = false;
     await new Promise((resolve) => setTimeout(resolve, 2500));
     await connect(false);
