@@ -41,11 +41,14 @@ async function connect(force) {
             console.log('No device picked');
             return;
         }
+
         device.addEventListener('gattserverdisconnected', onDisconnect);
         const server = await device.gatt.connect();
         const service = await server.getPrimaryService(0xFFE0);
         const characteristic = await service.getCharacteristic(0xFFE1);
         await characteristic.startNotifications();
+        if (device.id === 'XMPf1NtTCB4oXiZX091w0w==') bigButton.classList.add('big-button--blue');
+        else bigButton.classList.remove('big-button--blue');
         connectButton.disabled = true;
         try {
             wakeLock = await navigator.wakeLock.request('screen');

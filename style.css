@@ -63,6 +63,12 @@ button {
     padding: 32px;
 }
 
+#big-button.big-button--blue {
+    --top-center-color: #3254EC;
+    --top-edge-color: #153AE0;
+    --body-color: #1335CD;
+}
+
 #big-button {
     --top-center-color: #AB2121;
     --top-edge-color: #9A1D1D;
