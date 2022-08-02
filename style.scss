@@ -1,0 +1,141 @@
+@use "sass:map";
+
+body {
+    background-color: #201E1F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+#buttons {
+    display: flex;
+    --button-diameter: min(min(50vw, 90vh), 500px);
+
+    > div {
+        width: var(--button-diameter);
+        height: var(--button-diameter);
+        border-radius: 50%;
+        box-sizing: border-box;
+    }
+}
+
+#buttons-left {
+    z-index: 1;
+    padding: calc(var(--button-diameter) * 0.05);
+}
+
+.big-button {
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+#big-red-button {
+    background-color: #c00;
+    width: 100%;
+    height: 100%;
+}
+
+#buttons-right {
+    margin-left: calc(var(--button-diameter) * (-0.2));
+    display: grid;
+    align-items: center;
+    justify-items: center;
+
+    > * {
+        grid-row: 1;
+        grid-column: 1;
+    }
+}
+
+#big-blue-button {
+    $diameter: calc(var(--button-diameter) * 0.6);
+    width: $diameter;
+    height: $diameter;
+    background-color: #00f;
+}
+
+.small-button {
+    --base-rotation: 90deg;
+    --actual-rotation: calc(var(--base-rotation) + var(--index) * 36deg);
+    --small-button-diameter: calc(var(--button-diameter) * 0.15);
+    transform:
+        rotate(var(--actual-rotation))
+        translate(calc((var(--button-diameter) - var(--small-button-diameter)) / -2))
+        rotate(calc(-1 * var(--actual-rotation)));
+    offset-distance: 0;
+    width: var(--small-button-diameter);
+    height: var(--small-button-diameter);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+}
+
+#connect-button {
+    background: #111;
+    color: #ccc;
+    --index: -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 0 0 calc(var(--button-diameter) * 0.005);
+    transition: color 400ms, text-shadow 400ms;
+
+    &:disabled {
+        $bluetooth-color: #0082fc;
+        color: $bluetooth-color;
+        text-shadow: 0 0 20px $bluetooth-color;
+        cursor: default;
+    }
+}
+
+#connect-button-icon {
+    font-size: calc(var(--button-diameter) * 0.1);
+}
+
+$colors: (
+        0: #e00,
+        1: #ffa500,
+        2: #ee0,
+        3: green,
+        4: #00d,
+        5: #eee,
+        6: #111
+);
+
+@for $i from 0 to 7 {
+    $color: map.get($colors, $i);
+
+    #small-button-#{$i} {
+        --index: #{$i};
+        background: radial-gradient(circle,
+            lighten($color, 2%) 0%,
+            lighten($color, 2%) 40%,
+            $color 40%,
+            darken($color, 5%) 100%
+        );
+    }
+}
+
+@media (orientation: portrait) {
+    #buttons {
+        flex-direction: column;
+        --button-diameter: min(min(50vh, 90vw), 500px);
+    }
+
+    #buttons-right {
+        margin-left: 0;
+        margin-top: calc(var(--button-diameter) * (-0.2));
+    }
+
+    .small-button {
+        --base-rotation: 180deg;
+    }
+}

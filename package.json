@@ -1,0 +1,20 @@
+{
+  "scripts": {
+    "build": "sass style.scss style.css",
+    "dev": "sass style.scss style.css --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dominik-korsa/buzzer.git"
+  },
+  "author": "Dominik Korsa <dominik.korsa@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dominik-korsa/buzzer/issues"
+  },
+  "homepage": "https://github.com/dominik-korsa/buzzer#readme",
+  "private": true,
+  "dependencies": {
+    "sass": "^1.54.0"
+  }
+}
