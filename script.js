@@ -1,7 +1,7 @@
 const connectButton = document.getElementById('connect-button');
 const connectButtonIcon = document.getElementById('connect-button-icon');
 
-const files = ['buzzer.mp3', 'ding.mp3', 'emergency-meeting.mp3']
+const files = [undefined, 'ding.mp3', undefined, 'emergency-meeting.mp3', undefined, undefined, undefined, 'buzzer.mp3'];
 const players = files.map((file) => new Audio(`sounds/${file}`));
 
 function playSound(index) {
@@ -19,6 +19,8 @@ for (let i = 0; i < 7; ++i) {
         playSound(i)
     });
 }
+document.getElementById('big-red-button').addEventListener('click', () => playSound(7));
+document.getElementById('big-blue-button').addEventListener('click', () => playSound(8));
 
 // player.addEventListener('play', () => {
 //     bigButton.classList.add('big-button--pressed');
@@ -96,7 +98,7 @@ const formatter = new Intl.ListFormat('en', {style: 'long', type: 'conjunction'}
 let previousValue = 0;
 
 function onValueChange(dataView) {
-    const value = dataView.getInt8(0);
+    const value = dataView.getUint16(0, true);
     getLitBytes(value & (previousValue ^ value)).forEach((i) => {
         playSound(i);
     });
