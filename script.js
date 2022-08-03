@@ -1,7 +1,7 @@
 const connectButton = document.getElementById('connect-button');
 const connectButtonIcon = document.getElementById('connect-button-icon');
 
-const files = [undefined, 'ding.mp3', undefined, 'emergency-meeting.mp3', undefined, undefined, undefined, 'buzzer.mp3'];
+const files = ['emergency-meeting.mp3', undefined, undefined, 'dobrze.mp3', undefined, undefined, undefined, 'buzzer.mp3', 'ding.mp3'];
 const players = files.map((file) => new Audio(`sounds/${file}`));
 
 function playSound(index) {
@@ -14,13 +14,14 @@ function playSound(index) {
     player.play();
 }
 
-for (let i = 0; i < 7; ++i) {
-    document.getElementById(`small-button-${i}`).addEventListener('click', () => {
-        playSound(i)
-    });
+function bindButton(elementId, index) {
+    let button = document.getElementById(elementId);
+    button.addEventListener('click', () => playSound(index));
+    button.title = files[index] || 'No sound';
 }
-document.getElementById('big-red-button').addEventListener('click', () => playSound(7));
-document.getElementById('big-blue-button').addEventListener('click', () => playSound(8));
+for (let i = 0; i < 7; ++i) bindButton(`small-button-${i}`, i);
+bindButton("big-red-button", 7);
+bindButton("big-blue-button", 8);
 
 // player.addEventListener('play', () => {
 //     bigButton.classList.add('big-button--pressed');
@@ -34,13 +35,29 @@ let wakeLock = null;
 async function connect(prompt) {
     console.log('Connecting...');
     try {
-        let server;
+        let server = null;
         try {
             const devices = await navigator.bluetooth.getDevices();
             if (devices.length > 0) {
                 const device = devices[0];
                 console.log(device);
-                await devices[0].watchAdvertisements();
+                const promise = new Promise((resolve, reject) => {
+                    const listener = () => {
+                        clearTimeout(timeoutId);
+                        resolve();
+                    };
+                    device.addEventListener('advertisementreceived', listener);
+                    let timeoutId = setTimeout(() => {
+                        device.removeEventListener('advertisementreceived', listener);
+                        reject(new Error('Timeout waiting for advertisement'));
+                    }, 10000);
+                })
+                await device.watchAdvertisements();
+                try {
+                    await promise;
+                } catch (error) {
+                    console.warn(error);
+                }
                 server = await device.gatt.connect();
                 device.addEventListener('gattserverdisconnected', onDisconnect);
                 console.log('GATT server connected');
