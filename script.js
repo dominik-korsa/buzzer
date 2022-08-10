@@ -14,14 +14,11 @@ function playSound(index) {
     player.play();
 }
 
-function bindButton(elementId, index) {
-    let button = document.getElementById(elementId);
-    button.addEventListener('click', () => playSound(index));
-    button.title = files[index] || 'No sound';
+for (let i = 0; i < 9; ++i) {
+    let button = document.getElementById(`button-${i}`);
+    button.addEventListener('click', () => playSound(i));
+    button.title = files[i] || 'No sound';
 }
-for (let i = 0; i < 7; ++i) bindButton(`small-button-${i}`, i);
-bindButton("big-red-button", 7);
-bindButton("big-blue-button", 8);
 
 // player.addEventListener('play', () => {
 //     bigButton.classList.add('big-button--pressed');
@@ -44,14 +41,15 @@ async function connect(prompt) {
                 const promise = new Promise((resolve, reject) => {
                     const listener = () => {
                         clearTimeout(timeoutId);
+                        console.log('Advertisement received');
                         resolve();
                     };
-                    device.addEventListener('advertisementreceived', listener);
+                    device.addEventListener('advertisementreceived', listener, { once: true });
                     let timeoutId = setTimeout(() => {
                         device.removeEventListener('advertisementreceived', listener);
                         reject(new Error('Timeout waiting for advertisement'));
-                    }, 10000);
-                })
+                    }, 5000);
+                });
                 await device.watchAdvertisements();
                 try {
                     await promise;
@@ -118,6 +116,10 @@ function onValueChange(dataView) {
     const value = dataView.getUint16(0, true);
     getLitBytes(value & (previousValue ^ value)).forEach((i) => {
         playSound(i);
+        document.getElementById(`button-${i}`).classList.add('pressed');
+    });
+    getLitBytes(previousValue & (previousValue ^ value)).forEach((i) => {
+        document.getElementById(`button-${i}`).classList.remove('pressed');
     });
     previousValue = value;
 }
@@ -132,4 +134,11 @@ async function onDisconnect() {
     await connect(false);
 }
 
-connect(false)
+async function start() {
+    console.log('Starting...');
+    const devices = await navigator.bluetooth.getDevices();
+    await Promise.all(devices.map((device) => device.watchAdvertisements()))
+    console.log('Ready!');
+}
+
+start().catch(console.error);
