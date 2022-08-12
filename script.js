@@ -26,11 +26,19 @@ let bluePlayingCount = 0;
 let redLedCharacteristic = null;
 let blueLedCharacteristic = null;
 
-function updateLEDs() {
-    return Promise.all([
-        redLedCharacteristic.writeValueWithoutResponse(new Uint8Array([ redPlayingCount > 0 ])),
-        blueLedCharacteristic.writeValueWithoutResponse(new Uint8Array([ bluePlayingCount > 0 ])),
+async function updateLEDs() {
+    const redPlaying = redPlayingCount > 0;
+    const bluePlaying = bluePlayingCount > 0;
+
+    await Promise.all([
+        redLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([ redPlaying ])),
+        blueLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([ bluePlaying ])),
     ]);
+
+    document.getElementById('button-7')
+        .classList[redPlaying ? 'add' : 'remove']('playing');
+    document.getElementById('button-8')
+        .classList[bluePlaying ? 'add' : 'remove']('playing');
 }
 
 players.forEach((player, index) => {
