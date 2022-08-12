@@ -234,7 +234,7 @@ async function loadConfig() {
             showConfigWithError('Cannot load configuration', `Server responded with status code ${response.status} ${response.statusText}`);
             return;
         }
-        data = await response.json();
+        data = JSON.parse(JSON.minify(await response.text()));
     } catch (error) {
         console.error(error);
         showConfigWithError('Cannot load configuration', error.message);
