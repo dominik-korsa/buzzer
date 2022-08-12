@@ -44,8 +44,12 @@ $left-buttons-padding: 0.05;
 }
 
 .big-button {
+    $max-offset: calc(0.05 * var(--big-button-diameter));
+    --offset-scale: 1;
     width: var(--big-button-diameter);
-    height: var(--big-button-diameter);
+    height: calc(var(--big-button-diameter) + $max-offset);
+    margin-top: calc(-1 * $max-offset);
+    border-radius: calc(var(--big-button-diameter) * 0.5);
     background: none;
     border: none;
     cursor: pointer;
@@ -53,15 +57,10 @@ $left-buttons-padding: 0.05;
     display: flex;
     flex-direction: column;
     justify-content: end;
-    --offset-scale: 1;
-    outline: none;
+    outline: solid 2px white;
+    outline-offset: 8px;
 
-    &:focus .top {
-        outline: solid 2px white;
-        outline-offset: 5px;
-    }
-
-    &:focus:not(:focus-visible) .top {
+    &:not(:focus), &:focus:not(:focus-visible) {
         outline: none;
     }
 
@@ -72,7 +71,7 @@ $left-buttons-padding: 0.05;
         box-sizing: border-box;
         border-radius: 50%;
         margin-bottom: -50%;
-        margin-top: calc(-0.05 * var(--offset-scale) * var(--big-button-diameter));
+        margin-top: calc($max-offset * (1 - var(--offset-scale)));
         border: 5px solid;
         z-index: 2;
         transition: margin-top 300ms ease-out;
