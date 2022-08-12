@@ -223,3 +223,5 @@ const resizeObserver = new ResizeObserver(entries => {
     document.documentElement.style.setProperty('--win-height', `${entries[0].target.clientHeight - 1}px`);
 });
 resizeObserver.observe(document.getElementById('content'));
+
+const goFullscreen = () => document.documentElement.requestFullscreen();
