@@ -1,8 +1,7 @@
 const connectButton = document.getElementById('connect-button');
 const connectButtonIcon = document.getElementById('connect-button-icon');
 
-const files = ['emergency-meeting.mp3', undefined, undefined, 'dobrze.mp3', undefined, undefined, undefined, 'buzzer.mp3', 'ding.mp3'];
-const players = files.map((file) => new Audio(`sounds/${file}`));
+let players;
 
 const gattQueue = {
     handlers: [],
@@ -44,13 +43,13 @@ for (let i = 0; i < 9; ++i) {
         button.setPointerCapture(event.pointerId);
         playSound(i);
     });
-    button.addEventListener('pointercancel', (event) => {
+    button.addEventListener('pointercancel', () => {
         button.classList.remove('pressed');
     });
-    button.addEventListener('pointerup', (event) => {
+    button.addEventListener('pointerup', () => {
         button.classList.remove('pressed');
     });
-    button.addEventListener('contextmenu', (event) => {
+    button.addEventListener('contextmenu', () => {
         if (event.pointerType !== 'mouse') event.preventDefault();
     });
     let spacePressed = false;
@@ -68,7 +67,6 @@ for (let i = 0; i < 9; ++i) {
         else return;
         button.classList.remove('pressed');
     });
-    button.title = files[i] || 'No sound';
 }
 
 let redPlayingCount = 0;
@@ -91,17 +89,6 @@ async function updateLEDs() {
     document.getElementById('button-8')
         .classList[bluePlaying ? 'add' : 'remove']('playing');
 }
-
-players.forEach((player, index) => {
-    player.addEventListener('play', async () => {
-        if (index === 7) redPlayingCount++; else bluePlayingCount++;
-        await updateLEDs();
-    });
-    player.addEventListener('ended', async () => {
-        if (index === 7) redPlayingCount--; else bluePlayingCount--;
-        await updateLEDs();
-    });
-});
 
 let wakeLock = null;
 
@@ -223,7 +210,69 @@ async function onDisconnect() {
     await connect(false);
 }
 
+const configDialog = document.getElementById('config-dialog');
+configDialog.addEventListener('cancel', (event) => { event.preventDefault(); });
+function showConfigWithError(message, details = '') {
+    document.getElementById('config-dialog-error').classList.remove('hidden');
+    document.getElementById('config-dialog-error__message').innerText = message;
+    document.getElementById('config-dialog-error__details').innerText = details;
+    configDialog.showModal();
+}
+async function loadConfig() {
+    const params = new URLSearchParams(window.location.search);
+    const configUrl = params.get('config');
+    if (!configUrl) {
+        configDialog.showModal();
+        return false;
+    }
+
+    let data;
+    try {
+        const response = await fetch(configUrl);
+        if (!response.ok) {
+            showConfigWithError('Cannot load configuration', `Server responded with status code ${response.status} ${response.statusText}`);
+            return;
+        }
+        data = await response.json();
+    } catch (error) {
+        console.error(error);
+        showConfigWithError('Cannot load configuration', error.message);
+        return;
+    }
+    console.log(data);
+    if (!('sounds' in data)) showConfigWithError('Missing `sounds` field in config');
+    else if (!(data.sounds instanceof Array)) showConfigWithError('`sounds` field should be an array');
+    else if (data.sounds.length !== 9) showConfigWithError(`\`sounds\` array should have 9 items (currently has ${data.sounds.length})`);
+    else try {
+        players = data.sounds.map((entry, index) => {
+            const button = document.getElementById(`button-${index}`);
+            if (!entry || !entry.url) {
+                button.title = 'No sound';
+                return null;
+            }
+            button.title = entry.name ?? entry.url;
+            return new Audio(new URL(entry.url, configUrl).toString());
+        });
+
+        players.forEach((player, index) => {
+            if (!player) return;
+            player.addEventListener('play', async () => {
+                if (index === 7) redPlayingCount++; else bluePlayingCount++;
+                await updateLEDs();
+            });
+            player.addEventListener('ended', async () => {
+                if (index === 7) redPlayingCount--; else bluePlayingCount--;
+                await updateLEDs();
+            });
+        });
+        return true;
+    } catch (error) { showConfigWithError(error.message); }
+    return false;
+}
+
 async function start() {
+    if (!await loadConfig()) return;
+
     console.log('Starting...');
     const devices = await navigator.bluetooth.getDevices();
     await Promise.all(devices.map((device) => device.watchAdvertisements()))

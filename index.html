@@ -20,6 +20,17 @@
     </style>
 </head>
 <body>
+<dialog id="config-dialog">
+    <div id="config-dialog-error" class="hidden">
+        <div id="config-dialog-error__message"></div>
+        <samp id="config-dialog-error__details"></samp>
+    </div>
+    <form>
+        <label for="config-input">Configuration URL</label><br>
+        <input id="config-input" name="config" type="url" required>
+        <input type="submit">
+    </form>
+</dialog>
 <div id="content">
     <div id="buttons">
         <div id="buttons-left">
