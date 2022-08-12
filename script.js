@@ -45,15 +45,28 @@ for (let i = 0; i < 9; ++i) {
         playSound(i);
     });
     button.addEventListener('pointercancel', (event) => {
-        console.log('pointercancel', event);
         button.classList.remove('pressed');
     });
     button.addEventListener('pointerup', (event) => {
-        console.log('pointerup', event);
         button.classList.remove('pressed');
     });
     button.addEventListener('contextmenu', (event) => {
         if (event.pointerType !== 'mouse') event.preventDefault();
+    });
+    let spacePressed = false;
+    let enterPressed = false;
+    button.addEventListener('keydown', (event) => {
+        if (event.code === 'Space' && !spacePressed) spacePressed = true;
+        else if (event.code === 'Enter' && !enterPressed) enterPressed = true;
+        else return;
+        playSound(i);
+        button.classList.add('pressed');
+    });
+    button.addEventListener('keyup', (event) => {
+        if (event.code === 'Space') spacePressed = false;
+        else if (event.code === 'Enter') enterPressed = false;
+        else return;
+        button.classList.remove('pressed');
     });
     button.title = files[i] || 'No sound';
 }
