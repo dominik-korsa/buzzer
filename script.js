@@ -38,8 +38,22 @@ function playSound(index) {
 for (let i = 0; i < 9; ++i) {
     let button = document.getElementById(`button-${i}`);
     button.addEventListener('pointerdown', (event) => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        button.classList.add('pressed');
         event.preventDefault();
+        button.setPointerCapture(event.pointerId);
         playSound(i);
+    });
+    button.addEventListener('pointercancel', (event) => {
+        console.log('pointercancel', event);
+        button.classList.remove('pressed');
+    });
+    button.addEventListener('pointerup', (event) => {
+        console.log('pointerup', event);
+        button.classList.remove('pressed');
+    });
+    button.addEventListener('contextmenu', (event) => {
+        if (event.pointerType !== 'mouse') event.preventDefault();
     });
     button.title = files[i] || 'No sound';
 }
@@ -204,3 +218,8 @@ async function start() {
 }
 
 start().catch(console.error);
+
+const resizeObserver = new ResizeObserver(entries => {
+    document.documentElement.style.setProperty('--win-height', `${entries[0].target.clientHeight - 1}px`);
+});
+resizeObserver.observe(document.getElementById('content'));
