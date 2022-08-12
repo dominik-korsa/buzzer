@@ -24,11 +24,11 @@ button {
 
 #buttons {
     display: flex;
-    --button-diameter: min(min(50vw, calc(0.9 * var(--win-height))), 500px);
+    --circle-diameter: min(min(50vw, calc(0.9 * var(--win-height))), 500px);
 
     > div {
-        width: var(--button-diameter);
-        height: var(--button-diameter);
+        width: var(--circle-diameter);
+        height: var(--circle-diameter);
         border-radius: 50%;
         box-sizing: border-box;
     }
@@ -37,11 +37,11 @@ button {
 $left-buttons-padding: 0.05;
 #buttons-left {
     z-index: 1;
-    padding: calc(var(--button-diameter) * $left-buttons-padding);
+    padding: calc(var(--circle-diameter) * $left-buttons-padding);
 }
 
 #buttons-right {
-    margin-left: calc(var(--button-diameter) * (-0.2));
+    margin-left: calc(var(--circle-diameter) * (-0.2));
     display: grid;
     align-items: center;
     justify-items: center;
@@ -52,22 +52,23 @@ $left-buttons-padding: 0.05;
     }
 }
 
-.big-button {
-    $max-offset: calc(0.05 * var(--big-button-diameter));
+.button {
+    $max-offset: calc(var(--max-offset-amount) * var(--button-diameter));
     --offset-scale: 1;
-    width: var(--big-button-diameter);
-    height: calc(var(--big-button-diameter) + $max-offset);
+    width: var(--button-diameter);
+    height: calc(var(--button-diameter) + $max-offset);
     margin-top: calc(-1 * $max-offset);
-    border-radius: calc(var(--big-button-diameter) * 0.5);
+    border-radius: calc(var(--button-diameter) * 0.5);
     background: none;
     border: none;
-    cursor: pointer;
     padding: 0;
     display: flex;
     flex-direction: column;
     justify-content: end;
     outline: solid 2px white;
     outline-offset: 8px;
+    touch-action: none;
+    cursor: pointer;
 
     &:not(:focus), &:focus:not(:focus-visible) {
         outline: none;
@@ -75,36 +76,35 @@ $left-buttons-padding: 0.05;
 
     .top {
         display: block;
-        width: var(--big-button-diameter);
-        height: var(--big-button-diameter);
+        width: var(--button-diameter);
+        height: var(--button-diameter);
         box-sizing: border-box;
         border-radius: 50%;
         margin-bottom: -50%;
         margin-top: calc($max-offset * (1 - var(--offset-scale)));
-        border: 5px solid;
         z-index: 2;
         transition: margin-top 300ms ease-out;
     }
 
     .side {
         display: block;
-        width: var(--big-button-diameter);
+        width: var(--button-diameter);
         flex-grow: 1;
-        border-bottom-left-radius: calc(var(--big-button-diameter) * 0.5);
-        border-bottom-right-radius: calc(var(--big-button-diameter) * 0.5);
+        border-bottom-left-radius: calc(var(--button-diameter) * 0.5);
+        border-bottom-right-radius: calc(var(--button-diameter) * 0.5);
         z-index: 1;
     }
 
     .bottom {
         $border-thickness: 5px;
         margin: calc(-100% - $border-thickness) #{-$border-thickness} #{-$border-thickness};
-        height: calc(var(--big-button-diameter) + 2*$border-thickness);
-        width: calc(var(--big-button-diameter) + 2*$border-thickness);
+        height: calc(var(--button-diameter) + 2*$border-thickness);
+        width: calc(var(--button-diameter) + 2*$border-thickness);
         background-color: black;
         border-radius: 50%;
     }
 
-    &.pressed {
+    &.pressed, &#connect-button:not(:disabled):active {
         --offset-scale: 0.25;
 
         .top {
@@ -113,8 +113,27 @@ $left-buttons-padding: 0.05;
     }
 }
 
+.big-button {
+    --max-offset-amount: 0.05;
+
+    .top {
+        border: 5px solid;
+    }
+}
+
+.small-button {
+    --max-offset-amount: 0.075;
+    --base-rotation: 90deg;
+    --actual-rotation: calc(var(--base-rotation) + var(--index) * 36deg);
+    --button-diameter: calc(var(--circle-diameter) * 0.15);
+    transform:
+            rotate(var(--actual-rotation))
+            translate(calc((var(--circle-diameter) - var(--button-diameter)) / -2))
+            rotate(calc(-1 * var(--actual-rotation)));
+}
+
 #button-7 {
-    --big-button-diameter: calc(var(--button-diameter) * #{1 - 2*$left-buttons-padding});
+    --button-diameter: calc(var(--circle-diameter) * #{1 - 2*$left-buttons-padding});
     $color: #A00000;
 
     .top {
@@ -147,7 +166,7 @@ $left-buttons-padding: 0.05;
 }
 
 #button-8 {
-    --big-button-diameter: calc(var(--button-diameter) * 0.6);
+    --button-diameter: calc(var(--circle-diameter) * 0.6);
     $color: #00008C;
 
     .top {
@@ -179,40 +198,23 @@ $left-buttons-padding: 0.05;
     }
 }
 
-.small-button {
-    --base-rotation: 90deg;
-    --actual-rotation: calc(var(--base-rotation) + var(--index) * 36deg);
-    --small-button-diameter: calc(var(--button-diameter) * 0.15);
-    border: 5px solid black;
-    border-radius: 50%;
-    box-shadow: 0 4px 6px 2px #0004;
-    transform:
-        rotate(var(--actual-rotation))
-        translate(calc((var(--button-diameter) - var(--small-button-diameter)) / -2))
-        rotate(calc(-1 * var(--actual-rotation)));
-    width: var(--small-button-diameter);
-    height: var(--small-button-diameter);
-    cursor: pointer;
-    transition: border-color 200ms, box-shadow 200ms;
-
-    &.pressed {
-        border-color: #0082fc;
-        &.small-button {
-            box-shadow: 0 0 10px 2px #0082fc;
-        }
-    }
-}
-
 #connect-button {
-    background: #111;
     color: #ccc;
     --index: -1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 0 0 0 calc(var(--button-diameter) * 0.005);
     transition: color 400ms, text-shadow 400ms;
+
+    .top {
+        padding: 0 0 0 calc(var(--circle-diameter) * 0.005);
+        background: #151515;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .side {
+        background: #111;
+    }
 
     &:disabled {
         $bluetooth-color: #0082fc;
@@ -223,7 +225,7 @@ $left-buttons-padding: 0.05;
 }
 
 #connect-button-icon {
-    font-size: calc(var(--button-diameter) * 0.1);
+    font-size: calc(var(--circle-diameter) * 0.1);
 }
 
 $colors: (
@@ -233,7 +235,7 @@ $colors: (
         3: green,
         4: #00d,
         5: #eee,
-        6: #111
+        6: #282828
 );
 
 @for $i from 0 to 7 {
@@ -241,28 +243,36 @@ $colors: (
 
     #button-#{$i} {
         --index: #{$i};
-        background: radial-gradient(circle,
-            lighten($color, 2%) 0%,
-            lighten($color, 2%) 40%,
-            $color 40%,
-            darken($color, 5%) 100%
-        );
+
+        .top {
+            background: radial-gradient(circle,
+                lighten($color, 2%) 0%,
+                lighten($color, 2%) 40%,
+                $color 40%,
+                darken($color, 5%) 100%
+            );
+        }
     }
 }
 
-.button {
-    touch-action: none;
+@for $i from 0 to 6 {
+    #button-#{$i} .side {
+        background: darken(map.get($colors, $i), 15%);
+    }
+}
+#button-6 .side {
+    background: #161616;
 }
 
 @media (orientation: portrait) {
     #buttons {
         flex-direction: column;
-        --button-diameter: min(min(50vh, 90vw), 500px);
+        --circle-diameter: min(min(50vh, 90vw), 500px);
     }
 
     #buttons-right {
         margin-left: 0;
-        margin-top: calc(var(--button-diameter) * (-0.2));
+        margin-top: calc(var(--circle-diameter) * (-0.2));
     }
 
     .small-button {
