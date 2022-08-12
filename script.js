@@ -20,12 +20,29 @@ for (let i = 0; i < 9; ++i) {
     button.title = files[i] || 'No sound';
 }
 
-// player.addEventListener('play', () => {
-//     bigButton.classList.add('big-button--pressed');
-// });
-// player.addEventListener('ended', () => {
-//     bigButton.classList.remove('big-button--pressed');
-// });
+let redPlayingCount = 0;
+let bluePlayingCount = 0;
+
+let redLedCharacteristic = null;
+let blueLedCharacteristic = null;
+
+function updateLEDs() {
+    return Promise.all([
+        redLedCharacteristic.writeValueWithoutResponse(new Uint8Array([ redPlayingCount > 0 ])),
+        blueLedCharacteristic.writeValueWithoutResponse(new Uint8Array([ bluePlayingCount > 0 ])),
+    ]);
+}
+
+players.forEach((player, index) => {
+    player.addEventListener('play', async () => {
+        if (index === 7) redPlayingCount++; else bluePlayingCount++;
+        await updateLEDs();
+    });
+    player.addEventListener('ended', async () => {
+        if (index === 7) redPlayingCount--; else bluePlayingCount--;
+        await updateLEDs();
+    });
+});
 
 let wakeLock = null;
 
@@ -79,8 +96,19 @@ async function connect(prompt) {
 
         if (!server) return;
         const service = await server.getPrimaryService('9877867b-0423-41db-a5ab-28d28f73e179');
-        const characteristic = await service.getCharacteristic('c8123c59-a994-4a78-be72-cf18878c803a');
-        await characteristic.startNotifications();
+        let buttonsCharacteristic;
+        [
+            buttonsCharacteristic,
+            redLedCharacteristic,
+            blueLedCharacteristic
+        ] = await Promise.all([
+            'c8123c59-a994-4a78-be72-cf18878c803a',
+            'ebb830c8-2fb5-418c-af89-1c4911e1ac86',
+            'd08e6f8f-0e4b-4eec-88e5-130f17f35c7a'
+        ].map((uuid) => service.getCharacteristic(uuid)));
+        await updateLEDs();
+        await buttonsCharacteristic.startNotifications();
+
         connectButton.disabled = true;
         connectButtonIcon.innerText = 'bluetooth_connected';
         try {
@@ -90,9 +118,9 @@ async function connect(prompt) {
         }
 
         console.log('> Notifications started');
-        onValueChange(await characteristic.readValue());
-        characteristic.addEventListener('characteristicvaluechanged', () => {
-            onValueChange(characteristic.value);
+        onValueChange(await buttonsCharacteristic.readValue());
+        buttonsCharacteristic.addEventListener('characteristicvaluechanged', () => {
+            onValueChange(buttonsCharacteristic.value);
         });
     } catch (error) {
         console.error(error);
@@ -130,6 +158,8 @@ async function onDisconnect() {
     wakeLock = null;
     connectButton.disabled = false;
     connectButtonIcon.innerText = 'bluetooth';
+    redLedCharacteristic = null;
+    blueLedCharacteristic = null;
     await new Promise((resolve) => setTimeout(resolve, 2500));
     await connect(false);
 }
