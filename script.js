@@ -10,8 +10,7 @@ const gattQueue = {
         for (let i = 0; i < this.handlers.length; i++) {
             const {handler, resolve, reject} = this.handlers[i];
             try {
-                await handler();
-                resolve();
+                resolve(await handler());
             } catch (error) {
                 reject(error);
             }
@@ -38,7 +37,10 @@ function playSound(index) {
 
 for (let i = 0; i < 9; ++i) {
     let button = document.getElementById(`button-${i}`);
-    button.addEventListener('click', () => playSound(i));
+    button.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        playSound(i);
+    });
     button.title = files[i] || 'No sound';
 }
 
