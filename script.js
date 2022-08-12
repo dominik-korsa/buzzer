@@ -4,6 +4,28 @@ const connectButtonIcon = document.getElementById('connect-button-icon');
 const files = ['emergency-meeting.mp3', undefined, undefined, 'dobrze.mp3', undefined, undefined, undefined, 'buzzer.mp3', 'ding.mp3'];
 const players = files.map((file) => new Audio(`sounds/${file}`));
 
+const gattQueue = {
+    handlers: [],
+    async handleAll() {
+        for (let i = 0; i < this.handlers.length; i++) {
+            const {handler, resolve, reject} = this.handlers[i];
+            try {
+                await handler();
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        }
+        this.handlers = [];
+    },
+    enqueue(handler) {
+        return new Promise((resolve, reject) => {
+            this.handlers.push({ handler, resolve, reject });
+            if (this.handlers.length === 1) this.handleAll().catch(console.error);
+        });
+    },
+};
+
 function playSound(index) {
     const player = players[index];
     if (!player) {
@@ -30,10 +52,10 @@ async function updateLEDs() {
     const redPlaying = redPlayingCount > 0;
     const bluePlaying = bluePlayingCount > 0;
 
-    await Promise.all([
-        redLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([ redPlaying ])),
-        blueLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([ bluePlaying ])),
-    ]);
+    await gattQueue.enqueue(async () => {
+        await redLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([ redPlaying ]));
+        await blueLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([ bluePlaying ]));
+    });
 
     document.getElementById('button-7')
         .classList[redPlaying ? 'add' : 'remove']('playing');
