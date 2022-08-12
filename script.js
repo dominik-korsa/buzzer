@@ -25,11 +25,12 @@ const gattQueue = {
 };
 
 function playSound(index) {
-    const player = players[index];
-    if (!player) {
+    const buttonPlayers = players[index];
+    if (buttonPlayers.length === 0) {
         console.warn(`No player for ${index}`);
         return;
     }
+    const player = buttonPlayers[Math.floor(Math.random() * buttonPlayers.length)];
     player.currentTime = 0;
     player.play();
 }
@@ -152,8 +153,11 @@ async function connect(prompt) {
             'ebb830c8-2fb5-418c-af89-1c4911e1ac86',
             'd08e6f8f-0e4b-4eec-88e5-130f17f35c7a'
         ].map((uuid) => service.getCharacteristic(uuid)));
-        await updateLEDs();
         await buttonsCharacteristic.startNotifications();
+        buttonsCharacteristic.addEventListener('characteristicvaluechanged', () => {
+            onValueChange(buttonsCharacteristic.value);
+        });
+        console.log('Notifications started');
 
         connectButton.disabled = true;
         connectButtonIcon.innerText = 'bluetooth_connected';
@@ -163,11 +167,8 @@ async function connect(prompt) {
             console.warn('Failed to request wake lock', err);
         }
 
-        console.log('> Notifications started');
         onValueChange(await buttonsCharacteristic.readValue());
-        buttonsCharacteristic.addEventListener('characteristicvaluechanged', () => {
-            onValueChange(buttonsCharacteristic.value);
-        });
+        await updateLEDs();
     } catch (error) {
         console.error(error);
     }
@@ -246,16 +247,16 @@ async function loadConfig() {
     else try {
         players = data.sounds.map((entry, index) => {
             const button = document.getElementById(`button-${index}`);
-            if (!entry || !entry.url) {
+            if (!entry || !entry.src || entry.src.length === 0) {
                 button.title = 'No sound';
-                return null;
+                return [];
             }
-            button.title = entry.name ?? entry.url;
-            return new Audio(new URL(entry.url, configUrl).toString());
+            const src = entry.src instanceof Array ? entry.src : [entry.src];
+            button.title = entry.name ?? src.join(', ');
+            return src.map(url => new Audio(new URL(url, configUrl).toString()));
         });
 
-        players.forEach((player, index) => {
-            if (!player) return;
+        players.forEach((players, index) => players.forEach(player => {
             player.addEventListener('play', async () => {
                 if (index === 7) redPlayingCount++; else bluePlayingCount++;
                 await updateLEDs();
@@ -264,7 +265,7 @@ async function loadConfig() {
                 if (index === 7) redPlayingCount--; else bluePlayingCount--;
                 await updateLEDs();
             });
-        });
+        }));
         return true;
     } catch (error) { showConfigWithError(error.message); }
     return false;
