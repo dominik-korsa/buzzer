@@ -25,13 +25,10 @@ button {
     }
 }
 
+$left-buttons-padding: 0.05;
 #buttons-left {
     z-index: 1;
-    padding: calc(var(--button-diameter) * 0.05);
-}
-
-.big-button {
-    cursor: pointer;
+    padding: calc(var(--button-diameter) * $left-buttons-padding);
 }
 
 #buttons-right {
@@ -46,44 +43,131 @@ button {
     }
 }
 
+.big-button {
+    width: var(--big-button-diameter);
+    height: var(--big-button-diameter);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    --offset-scale: 1;
+    outline: none;
+
+    &:focus .top {
+        outline: solid 2px white;
+        outline-offset: 5px;
+    }
+
+    &:focus:not(:focus-visible) .top {
+        outline: none;
+    }
+
+    .top {
+        display: block;
+        width: var(--big-button-diameter);
+        height: var(--big-button-diameter);
+        box-sizing: border-box;
+        border-radius: 50%;
+        margin-bottom: -50%;
+        margin-top: calc(-0.05 * var(--offset-scale) * var(--big-button-diameter));
+        border: 5px solid;
+        z-index: 2;
+        transition: margin-top 300ms ease-out;
+    }
+
+    .side {
+        display: block;
+        width: var(--big-button-diameter);
+        flex-grow: 1;
+        border-bottom-left-radius: calc(var(--big-button-diameter) * 0.5);
+        border-bottom-right-radius: calc(var(--big-button-diameter) * 0.5);
+        z-index: 1;
+    }
+
+    .bottom {
+        $border-thickness: 5px;
+        margin: calc(-100% - $border-thickness) #{-$border-thickness} #{-$border-thickness};
+        height: calc(var(--big-button-diameter) + 2*$border-thickness);
+        width: calc(var(--big-button-diameter) + 2*$border-thickness);
+        background-color: black;
+        border-radius: 50%;
+    }
+
+    &:active, &.pressed {
+        --offset-scale: 0.25;
+
+        .top {
+            transition: margin-top 100ms ease-out;
+        }
+    }
+}
+
 #button-7 {
-    width: 100%;
-    height: 100%;
+    --big-button-diameter: calc(var(--button-diameter) * #{1 - 2*$left-buttons-padding});
     $color: #A00000;
-    background: radial-gradient(circle,
+
+    .top {
+        background: radial-gradient(circle,
             $color 0%,
             $color 50%,
             darken($color, 5%) 70%
-    );
+        );
+        border-color: darken($color, 15%);
+    }
+
+    .side {
+        background: darken($color, 5%);
+    }
+
     &.playing {
-        background: radial-gradient(circle,
+        .top {
+            background: radial-gradient(circle,
                 #F44 0%,
                 #F22 30%,
                 #F00000 35%,
                 $color 70%
-        );
-        box-shadow: 0 0 50px 10px #F006;
+            );
+        }
+
+        .bottom {
+            box-shadow: 0 0 50px 10px #F006;
+        }
     }
 }
 
 #button-8 {
-    $diameter: calc(var(--button-diameter) * 0.6);
-    width: $diameter;
-    height: $diameter;
+    --big-button-diameter: calc(var(--button-diameter) * 0.6);
     $color: #00008C;
-    background: radial-gradient(circle,
+
+    .top {
+        background: radial-gradient(circle,
             $color 0%,
             $color 50%,
             darken($color, 5%) 70%
-    );
+        );
+        border-color: darken($color, 15%);
+    }
+
+    .side {
+        background-color: darken($color, 5%);
+    }
+
     &.playing {
-        background: radial-gradient(circle,
+        .top {
+            background: radial-gradient(circle,
                 #22F 0%,
                 #11F 30%,
                 #0000C8 45%,
                 $color 70%
-        );
-        box-shadow: 0 0 40px 10px #22f6;
+            );
+        }
+
+        .bottom {
+            box-shadow: 0 0 40px 10px #22f6;
+        }
     }
 }
 
@@ -91,15 +175,24 @@ button {
     --base-rotation: 90deg;
     --actual-rotation: calc(var(--base-rotation) + var(--index) * 36deg);
     --small-button-diameter: calc(var(--button-diameter) * 0.15);
+    border: 5px solid black;
+    border-radius: 50%;
+    box-shadow: 0 4px 6px 2px #0004;
     transform:
         rotate(var(--actual-rotation))
         translate(calc((var(--button-diameter) - var(--small-button-diameter)) / -2))
         rotate(calc(-1 * var(--actual-rotation)));
-    offset-distance: 0;
     width: var(--small-button-diameter);
     height: var(--small-button-diameter);
     cursor: pointer;
     transition: border-color 200ms, box-shadow 200ms;
+
+    &.pressed, &:not(#connect-button):active {
+        border-color: #0082fc;
+        &.small-button {
+            box-shadow: 0 0 10px 2px #0082fc;
+        }
+    }
 }
 
 #connect-button {
@@ -162,18 +255,5 @@ $colors: (
 
     .small-button {
         --base-rotation: 180deg;
-    }
-}
-
-.button {
-    border-radius: 50%;
-    border: 5px solid black;
-    box-shadow: 0 4px 6px 2px #0004;
-
-    &.pressed, &:not(#connect-button):active {
-        border-color: #0082fc;
-        &.small-button {
-            box-shadow: 0 0 10px 2px #0082fc;
-        }
     }
 }
