@@ -27,9 +27,9 @@
             ],
             "items": {
               "type": "string",
-              "pattern": "uri-reference"
+              "format": "uri-reference"
             },
-            "pattern": "uri-reference"
+            "format": "uri-reference"
           },
           "name": {
             "type": "string"
