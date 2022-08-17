@@ -217,6 +217,7 @@ async function onDisconnect() {
 }
 
 const configDialog = document.getElementById('config-dialog');
+const configHistory = document.getElementById('config-dialog__history');
 configDialog.addEventListener('cancel', (event) => { event.preventDefault(); });
 function showConfigWithError(message, details = '') {
     document.getElementById('config-dialog-error').classList.remove('hidden');
@@ -245,7 +246,11 @@ async function loadConfig() {
         showConfigWithError('Cannot load configuration', error.message);
         return;
     }
-    console.log(data);
+    const history = JSON.parse(localStorage.getItem('config-history') ?? '[]')
+        .filter((url) => url !== configUrl);
+    history.unshift(configUrl);
+    localStorage.setItem('config-history', JSON.stringify(history));
+
     if (!('sounds' in data)) showConfigWithError('Missing `sounds` field in config');
     else if (!(data.sounds instanceof Array)) showConfigWithError('`sounds` field should be an array');
     else if (data.sounds.length !== 9) showConfigWithError(`\`sounds\` array should have 9 items (currently has ${data.sounds.length})`);
@@ -279,6 +284,15 @@ async function loadConfig() {
 }
 
 async function start() {
+    const history = JSON.parse(localStorage.getItem('config-history') ?? '[]');
+    history.forEach((url) => {
+        const link = configHistory
+            .appendChild(document.createElement('li'))
+            .appendChild(document.createElement('a'));
+        link.text = url;
+        link.href = `/?config=${encodeURIComponent(url)}`;
+    })
+
     if (!await loadConfig()) return;
 
     console.log('Starting...');

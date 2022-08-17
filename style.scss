@@ -342,7 +342,7 @@ $colors: (
 
     #config-dialog__submit {
         display: block;
-        margin-top: 6px;
+        margin-top: 8px;
         margin-left: auto;
         background: #246A6B;
         border: 5px solid #1C5253;
@@ -350,9 +350,18 @@ $colors: (
         font-size: 12pt;
         color: white;
         padding: 6px 12px;
+        cursor: pointer;
     }
 }
 
-#config-dialog-error.hidden {
-    display: none;
+#config-dialog-error {
+    background: #fbb;
+    border: #800 2px solid;
+    border-radius: 10px;
+    padding: 6px 12px;
+    margin-bottom: 10px;
+
+    &.hidden {
+        display: none;
+    }
 }
