@@ -296,8 +296,7 @@ async function start() {
     if (!await loadConfig()) return;
 
     console.log('Starting...');
-    const devices = await navigator.bluetooth.getDevices();
-    await Promise.all(devices.map((device) => device.watchAdvertisements()))
+    await connect(false);
     console.log('Ready!');
 }
 
@@ -309,3 +308,7 @@ const resizeObserver = new ResizeObserver(entries => {
 resizeObserver.observe(document.getElementById('content'));
 
 const goFullscreen = () => document.documentElement.requestFullscreen();
+
+document.addEventListener('click', () => {
+    document.getElementById('interaction-required').classList.add('hidden');
+}, { once: true });
