@@ -1,7 +1,7 @@
 const connectButton = document.getElementById('connect-button');
 const connectButtonIcon = document.getElementById('connect-button-icon');
 
-let players;
+let buttons = [];
 
 const gattQueue = {
     handlers: [],
@@ -25,14 +25,19 @@ const gattQueue = {
 };
 
 function playSound(index) {
-    const buttonPlayers = players[index];
-    if (buttonPlayers.length === 0) {
+    const button = buttons[index];
+    if (button.players.length === 0) {
         console.warn(`No player for ${index}`);
         return;
     }
-    const player = buttonPlayers[Math.floor(Math.random() * buttonPlayers.length)];
+    const player = button.players[button.nextSound];
     player.currentTime = 0;
     player.play();
+    if (button.mode === 'random') {
+        button.nextSound = Math.floor(Math.random() * button.players.length);
+    } else {
+        button.nextSound = (button.nextSound + 1) % button.players.length;
+    }
 }
 
 for (let i = 0; i < 9; ++i) {
@@ -234,7 +239,7 @@ async function loadConfig() {
             showConfigWithError('Cannot load configuration', `Server responded with status code ${response.status} ${response.statusText}`);
             return;
         }
-        data = JSON.parse(JSON.minify(await response.text()));
+        data = jsyaml.load(await response.text());
     } catch (error) {
         console.error(error);
         showConfigWithError('Cannot load configuration', error.message);
@@ -245,18 +250,20 @@ async function loadConfig() {
     else if (!(data.sounds instanceof Array)) showConfigWithError('`sounds` field should be an array');
     else if (data.sounds.length !== 9) showConfigWithError(`\`sounds\` array should have 9 items (currently has ${data.sounds.length})`);
     else try {
-        players = data.sounds.map((entry, index) => {
+        buttons = data.sounds.map((entry, index) => {
             const button = document.getElementById(`button-${index}`);
-            if (!entry || !entry.src || entry.src.length === 0) {
-                button.title = 'No sound';
-                return [];
-            }
-            const src = entry.src instanceof Array ? entry.src : [entry.src];
-            button.title = entry.name ?? src.join(', ');
-            return src.map(url => new Audio(new URL(url, configUrl).toString()));
+            if (!entry) entry = { src: [] };
+            if (!entry.src) entry.src = [];
+            if (typeof entry.src === 'string') entry.src = [entry.src];
+            button.title = entry.name ?? (entry.src.length > 0 ? entry.src.join(', ') : 'No sound');
+            return {
+                players: entry.src.map(url => new Audio(new URL(url, configUrl).toString())),
+                mode: entry.mode || 'random',
+                nextSound: 0,
+            };
         });
 
-        players.forEach((players, index) => players.forEach(player => {
+        buttons.forEach(({ players }, index) => players.forEach(player => {
             player.addEventListener('play', async () => {
                 if (index === 7) redPlayingCount++; else bluePlayingCount++;
                 await updateLEDs();
