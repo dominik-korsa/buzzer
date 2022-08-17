@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "$id": "https://github.com/dominik-korsa/buzzer/blob/main/schema.json",
+  "$id": "https://cdn.jsdelivr.net/gh/dominik-korsa/buzzer@main/schema.json",
   "title": "Root Schema",
   "type": "object",
   "default": {
