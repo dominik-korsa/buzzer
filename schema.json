@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://github.com/dominik-korsa/buzzer/blob/main/schema.json",
+  "title": "Root Schema",
+  "type": "object",
+  "default": {
+    "sounds": []
+  },
+  "required": [
+    "sounds"
+  ],
+  "properties": {
+    "sounds": {
+      "title": "Sound list",
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": [
+          "src"
+        ],
+        "properties": {
+          "src": {
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "pattern": "uri-reference"
+            },
+            "pattern": "uri-reference"
+          },
+          "name": {
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "random",
+              "sequence"
+            ],
+            "default": "random"
+          }
+        }
+      },
+      "minItems": 9,
+      "maxItems": 9
+    }
+  }
+}
