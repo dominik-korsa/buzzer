@@ -24,7 +24,7 @@ async function loadConfig(): Promise<Config | null> {
     return null;
   }
 
-  let configSchema: ConfigSchema;
+  let inputConfig: ConfigSchema;
   try {
     const response = await fetch(configUrl);
     if (!response.ok) {
@@ -33,7 +33,7 @@ async function loadConfig(): Promise<Config | null> {
     }
     const data = jsyaml.load(await response.text());
     validateConfig(data);
-    configSchema = data;
+    inputConfig = data;
   } catch (error) {
     console.error(error);
     showConfigWithError('Cannot load configuration', error);
@@ -44,7 +44,7 @@ async function loadConfig(): Promise<Config | null> {
   history.unshift(configUrl);
   localStorage.setItem('config-history', JSON.stringify(history));
 
-  return parseConfig(configSchema, configUrl);
+  return parseConfig(inputConfig, configUrl);
 }
 
 const resizeObserver = new ResizeObserver(entries => {

@@ -1,5 +1,5 @@
 import { ButtonId } from "./config-schema.js";
-import { Sound } from "./config-parser.js";
+import { NamedSound } from "./config-parser.js";
 import { createPlayer, Player } from "./players.js";
 
 type PressType = 'space' | 'enter' | 'pointer' | 'bluetooth';
@@ -52,11 +52,11 @@ export class Button {
     }
   }
 
-  constructor(id: ButtonId, sound: Sound | null) {
+  constructor(id: ButtonId, sound: NamedSound) {
     this.el = document.getElementById(`${id}-button`) as HTMLButtonElement;
-    this.el.title = sound?.name ?? 'No sound';
+    this.el.title = sound.name ?? 'No sound';
     this.initEvents();
-    this.player = sound !== null ? createPlayer(sound) : null;
+    this.player = createPlayer(sound, false);
   }
 
   public onStart(handler: () => void) { this.player?.onStart(handler); }

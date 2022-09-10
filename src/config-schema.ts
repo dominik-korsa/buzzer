@@ -1,6 +1,7 @@
 import { Static, Type } from "@sinclair/typebox";
 import Ajv from "ajv";
 import addFormats from 'ajv-formats';
+import { IntersectAllOf, Nullable } from "./utils.js";
 
 export const buttonIds = ['red', 'orange', 'yellow', 'green', 'blue', 'white', 'black', 'big-red', 'big-blue'] as const;
 
@@ -8,14 +9,45 @@ export type ButtonId = (typeof buttonIds)[number];
 
 const srcSchema = Type.String({format: 'uri-reference'});
 
-const soundSchema = Type.Object({
+const basicSoundSchema = Type.Object({
   src: Type.Union([srcSchema, Type.Array(srcSchema, {minItems: 1})]),
-  name: Type.Optional(Type.String()),
-  mode: Type.Optional(Type.Union([Type.Literal('random'), Type.Literal('sequence')])),
-}, {
-  $id: '#/$defs/sound'
+  mode: Type.Optional(Type.Union([Type.Literal('sequence'), Type.Literal('random')])),
+}, {$id: '#/$defs/basicSound'});
+
+const cancellableBasicSoundSchema = IntersectAllOf([
+  Type.Object({
+    cancel: Type.Boolean(),
+  }),
+  Type.Ref(basicSoundSchema),
+], {$id: '#/$defs/cancellableBasicSound'})
+
+const pressReleaseSoundSchema = Type.Object({
+  press: Nullable(IntersectAllOf([
+    Type.Partial(Type.Object({
+      cancel: Type.Boolean(),
+      loop: Type.Boolean(),
+    })),
+    Type.Ref(basicSoundSchema),
+  ])),
+  release: Nullable(IntersectAllOf([
+    Type.Partial(Type.Object({
+      cancel: Type.Boolean(),
+    })),
+    Type.Ref(basicSoundSchema),
+  ])),
 });
-export type SoundSchema = Static<typeof soundSchema>;
+
+const soundSchema = IntersectAllOf(
+  [
+    Type.Object({
+      name: Type.Optional(Type.String()),
+    }),
+    Type.Union([
+      Type.Ref(basicSoundSchema),
+      pressReleaseSoundSchema,
+    ]),
+  ], {$id: '#/$defs/sound'},
+);
 
 const configSchema = Type.Object({
   sounds: Type.Partial(Type.Record(
@@ -23,12 +55,17 @@ const configSchema = Type.Object({
     Type.Ref(soundSchema),
   )),
 });
+
+export type BasicSoundSchema = Static<typeof basicSoundSchema>;
+export type SoundSchema = Static<typeof soundSchema>;
 export type ConfigSchema = Static<typeof configSchema>;
 
 export const fullConfigSchema = {
   ...configSchema,
   $defs: {
     sound: soundSchema,
+    basicSound: basicSoundSchema,
+    cancellableBasicSound: cancellableBasicSoundSchema,
   }
 }
 
