@@ -2,6 +2,8 @@ import { Static, Type } from "@sinclair/typebox";
 import Ajv from "ajv";
 import addFormats from 'ajv-formats';
 
+export const buttonIds = ['red', 'orange', 'yellow', 'green', 'blue', 'white', 'black', 'big-red', 'big-blue'] as const;
+
 const srcSchema = Type.String({format: 'uri-reference'});
 
 const soundSchema = Type.Object({
@@ -13,11 +15,13 @@ const soundSchema = Type.Object({
 });
 
 const configSchema = Type.Object({
-  sounds: Type.Record(
-    Type.Union(['red', 'orange', 'yellow', 'green', 'blue', 'white', 'black', 'big-red', 'big-blue'].map((key) => Type.Literal(key))),
+  sounds: Type.Partial(Type.Record(
+    Type.Union(buttonIds.map((key) => Type.Literal(key))),
     Type.Ref(soundSchema),
-  ),
+  )),
 });
+
+export type Config = Static<typeof configSchema>;
 
 export const fullConfigSchema = {
   ...configSchema,
@@ -43,7 +47,7 @@ const ajv = addFormats(new Ajv({}), [
   'regex'
 ]);
 
-export function validateConfig(inputConfig: unknown): asserts inputConfig is Static<typeof configSchema> {
+export function validateConfig(inputConfig: unknown): asserts inputConfig is Config {
   if (ajv.validate(fullConfigSchema, inputConfig)) return;
   const errors = ajv.errors ?? [];
   if (errors.length === 0) throw new Error('Failed to validate config');

@@ -1,9 +1,13 @@
 import jsyaml from 'js-yaml';
-import { validateConfig } from "./config-schema.js";
+import { buttonIds, Config, validateConfig } from "./config-schema.js";
 import PromiseQueue from './promise-queue.js';
 
 const connectButton = document.getElementById('connect-button') as HTMLButtonElement;
 const connectButtonIcon = document.getElementById('connect-button-icon')!;
+const fullscreenButton = document.getElementById('fullscreen-button') as HTMLButtonElement;
+
+connectButton.addEventListener('click', () => connect(true));
+fullscreenButton.addEventListener('click', () => goFullscreen());
 
 interface Button {
   players: HTMLAudioElement[];
@@ -227,15 +231,16 @@ async function loadConfig() {
     return false;
   }
 
-  let data;
+  let config: Config;
   try {
     const response = await fetch(configUrl);
     if (!response.ok) {
       showConfigWithError('Cannot load configuration', `Server responded with status code ${response.status} ${response.statusText}`);
       return;
     }
-    data = jsyaml.load(await response.text());
+    const data = jsyaml.load(await response.text());
     validateConfig(data);
+    config = data;
   } catch (error) {
     console.error(error);
     showConfigWithError('Cannot load configuration', error);
@@ -247,11 +252,8 @@ async function loadConfig() {
   localStorage.setItem('config-history', JSON.stringify(history));
 
   try {
-    buttons = data.sounds.map((entry, index) => {
-      let resolvedEntry = {
-        src: [],
-        ...entry ?? {},
-      };
+    buttons = buttonIds.map((buttonId, index) => {
+      let resolvedEntry = config.sounds[buttonId] ?? { src: [] };
       const button = document.getElementById(`button-${index}`)!;
       if (typeof resolvedEntry.src === 'string') resolvedEntry.src = [resolvedEntry.src];
       button.title = resolvedEntry.name ?? (resolvedEntry.src.length > 0 ? resolvedEntry.src.join(', ') : 'No sound');
@@ -303,7 +305,7 @@ const resizeObserver = new ResizeObserver(entries => {
 });
 resizeObserver.observe(document.getElementById('content')!);
 
-export const goFullscreen = () => document.documentElement.requestFullscreen();
+const goFullscreen = () => document.documentElement.requestFullscreen();
 
 document.addEventListener('click', () => {
   document.getElementById('interaction-required')!.classList.add('hidden');
