@@ -8,11 +8,23 @@ const soundSchema = Type.Object({
   src: Type.Union([srcSchema, Type.Array(srcSchema, {minItems: 1})]),
   name: Type.Optional(Type.String()),
   mode: Type.Optional(Type.Union([Type.Literal('random'), Type.Literal('sequence')])),
+}, {
+  $id: '#/$defs/sound'
 });
 
-export const configSchema = Type.Object({
-  sounds: Type.Array(Type.Union([soundSchema, Type.Null()]), {minItems: 9, maxItems: 9}),
+const configSchema = Type.Object({
+  sounds: Type.Record(
+    Type.Union(['red', 'orange', 'yellow', 'green', 'blue', 'white', 'black', 'big-red', 'big-blue'].map((key) => Type.Literal(key))),
+    Type.Ref(soundSchema),
+  ),
 });
+
+export const fullConfigSchema = {
+  ...configSchema,
+  $defs: {
+    sound: soundSchema,
+  }
+}
 
 const ajv = addFormats(new Ajv({}), [
   'date-time',
@@ -32,7 +44,7 @@ const ajv = addFormats(new Ajv({}), [
 ]);
 
 export function validateConfig(inputConfig: unknown): asserts inputConfig is Static<typeof configSchema> {
-  if (ajv.validate(configSchema, inputConfig)) return;
+  if (ajv.validate(fullConfigSchema, inputConfig)) return;
   const errors = ajv.errors ?? [];
   if (errors.length === 0) throw new Error('Failed to validate config');
   throw Error(ajv.errorsText(errors));
