@@ -1,7 +1,9 @@
 {
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build:site": "tsc && vite build",
+    "build:schema": "ts-node --esm build-schema.mts",
+    "build:all": "npm run build:site && npm run build:schema",
     "preview": "vite preview"
   },
   "repository": {
@@ -16,14 +18,20 @@
   "homepage": "https://github.com/dominik-korsa/buzzer#readme",
   "private": true,
   "dependencies": {
+    "@sinclair/typebox": "^0.24.39",
+    "ajv": "^8.11.0",
+    "ajv-formats": "^2.1.1",
     "js-yaml": "^4.1.0",
     "vite": "^3.1.0"
   },
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",
     "@types/dom-screen-wake-lock": "^1.0.0",
+    "@types/fs-extra": "^9.0.13",
     "@types/js-yaml": "^4.0.5",
     "@types/web-bluetooth": "^0.0.15",
+    "fs-extra": "^10.1.0",
+    "ts-node": "^10.9.1",
     "typescript": "^4.8.3"
   },
   "type": "module"
