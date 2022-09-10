@@ -1,387 +1,397 @@
 @use "sass:map";
 
 body {
-    background-color: #201E1F;
-    width: 100%;
-    height: 100vh;
-    box-sizing: border-box;
-    margin: 0;
+  background-color: #201E1F;
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+  margin: 0;
 }
 
 #content {
-    position: fixed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 button {
-    -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #buttons {
-    display: flex;
-    --circle-diameter: min(min(50vw, calc(0.9 * var(--win-height))), 500px);
+  display: flex;
+  --circle-diameter: min(min(50vw, calc(0.9 * var(--win-height))), 500px);
 
-    > div {
-        width: var(--circle-diameter);
-        height: var(--circle-diameter);
-        border-radius: 50%;
-        box-sizing: border-box;
-    }
+  > div {
+    width: var(--circle-diameter);
+    height: var(--circle-diameter);
+    border-radius: 50%;
+    box-sizing: border-box;
+  }
 }
 
 $left-buttons-padding: 0.05;
 #buttons-left {
-    z-index: 1;
-    padding: calc(var(--circle-diameter) * $left-buttons-padding);
+  z-index: 1;
+  padding: calc(var(--circle-diameter) * $left-buttons-padding);
 }
 
 #buttons-right {
-    margin-left: calc(var(--circle-diameter) * (-0.2));
-    display: grid;
-    align-items: center;
-    justify-items: center;
+  margin-left: calc(var(--circle-diameter) * (-0.2));
+  display: grid;
+  align-items: center;
+  justify-items: center;
 
-    > * {
-        grid-row: 1;
-        grid-column: 1;
-    }
+  > * {
+    grid-row: 1;
+    grid-column: 1;
+  }
 }
 
 .button {
-    $max-offset: calc(var(--max-offset-amount) * var(--button-diameter));
-    --offset-scale: 1;
-    width: var(--button-diameter);
-    height: calc(var(--button-diameter) + $max-offset);
-    margin-top: calc(-1 * $max-offset);
-    border-radius: calc(var(--button-diameter) * 0.5);
-    background: none;
-    border: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-    outline: solid 2px white;
-    outline-offset: 8px;
-    touch-action: none;
-    cursor: pointer;
+  $max-offset: calc(var(--max-offset-amount) * var(--button-diameter));
+  --offset-scale: 1;
+  width: var(--button-diameter);
+  height: calc(var(--button-diameter) + $max-offset);
+  margin-top: calc(-1 * $max-offset);
+  border-radius: calc(var(--button-diameter) * 0.5);
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  outline: solid 2px white;
+  outline-offset: 8px;
+  touch-action: none;
+  cursor: pointer;
 
-    &:not(:focus), &:focus:not(:focus-visible) {
-        outline: none;
-    }
+  &:not(:focus), &:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  .top {
+    display: block;
+    width: var(--button-diameter);
+    height: var(--button-diameter);
+    box-sizing: border-box;
+    border-radius: 50%;
+    margin-bottom: -50%;
+    margin-top: calc($max-offset * (1 - var(--offset-scale)));
+    z-index: 2;
+    transition: margin-top 300ms ease-out;
+  }
+
+  .side {
+    display: block;
+    width: var(--button-diameter);
+    flex-grow: 1;
+    border-bottom-left-radius: calc(var(--button-diameter) * 0.5);
+    border-bottom-right-radius: calc(var(--button-diameter) * 0.5);
+    z-index: 1;
+  }
+
+  .bottom {
+    $border-thickness: 5px;
+    margin: calc(-100% - $border-thickness) #{-$border-thickness} #{-$border-thickness};
+    height: calc(var(--button-diameter) + 2 * $border-thickness);
+    width: calc(var(--button-diameter) + 2 * $border-thickness);
+    background-color: black;
+    border-radius: 50%;
+  }
+
+  &.pressed, &#connect-button:not(:disabled):active {
+    --offset-scale: 0.25;
 
     .top {
-        display: block;
-        width: var(--button-diameter);
-        height: var(--button-diameter);
-        box-sizing: border-box;
-        border-radius: 50%;
-        margin-bottom: -50%;
-        margin-top: calc($max-offset * (1 - var(--offset-scale)));
-        z-index: 2;
-        transition: margin-top 300ms ease-out;
+      transition: margin-top 100ms ease-out;
     }
-
-    .side {
-        display: block;
-        width: var(--button-diameter);
-        flex-grow: 1;
-        border-bottom-left-radius: calc(var(--button-diameter) * 0.5);
-        border-bottom-right-radius: calc(var(--button-diameter) * 0.5);
-        z-index: 1;
-    }
-
-    .bottom {
-        $border-thickness: 5px;
-        margin: calc(-100% - $border-thickness) #{-$border-thickness} #{-$border-thickness};
-        height: calc(var(--button-diameter) + 2*$border-thickness);
-        width: calc(var(--button-diameter) + 2*$border-thickness);
-        background-color: black;
-        border-radius: 50%;
-    }
-
-    &.pressed, &#connect-button:not(:disabled):active {
-        --offset-scale: 0.25;
-
-        .top {
-            transition: margin-top 100ms ease-out;
-        }
-    }
+  }
 }
 
 .big-button {
-    --max-offset-amount: 0.05;
+  --max-offset-amount: 0.05;
 
-    .top {
-        border: 5px solid;
-    }
+  .top {
+    border: 5px solid;
+  }
 }
 
 .small-button {
-    --max-offset-amount: 0.075;
-    --base-rotation: 90deg;
-    --actual-rotation: calc(var(--base-rotation) + var(--index) * 36deg);
-    --button-diameter: calc(var(--circle-diameter) * 0.15);
-    transform:
-            rotate(var(--actual-rotation))
-            translate(calc((var(--circle-diameter) - var(--button-diameter)) / -2))
-            rotate(calc(-1 * var(--actual-rotation)));
+  --max-offset-amount: 0.075;
+  --base-rotation: 90deg;
+  --actual-rotation: calc(var(--base-rotation) + var(--index) * 36deg);
+  --button-diameter: calc(var(--circle-diameter) * 0.15);
+  transform: rotate(var(--actual-rotation)) translate(calc((var(--circle-diameter) - var(--button-diameter)) / -2)) rotate(calc(-1 * var(--actual-rotation)));
 }
 
-#button-7 {
-    --button-diameter: calc(var(--circle-diameter) * #{1 - 2*$left-buttons-padding});
-    $color: #A00000;
+#big-red-button {
+  --button-diameter: calc(var(--circle-diameter) * #{1 - 2*$left-buttons-padding});
+  $color: #A00000;
 
+  .top {
+    background: radial-gradient(circle,
+      $color 0%,
+      $color 50%,
+      darken($color, 5%) 70%
+    );
+    border-color: darken($color, 15%);
+  }
+
+  .side {
+    background: darken($color, 5%);
+  }
+
+  &.playing {
     .top {
-        background: radial-gradient(circle,
-            $color 0%,
-            $color 50%,
-            darken($color, 5%) 70%
-        );
-        border-color: darken($color, 15%);
+      background: radial-gradient(circle,
+        #F44 0%,
+        #F22 30%,
+        #F00000 35%,
+        $color 70%
+      );
     }
 
-    .side {
-        background: darken($color, 5%);
+    .bottom {
+      box-shadow: 0 0 50px 10px #F006;
     }
-
-    &.playing {
-        .top {
-            background: radial-gradient(circle,
-                #F44 0%,
-                #F22 30%,
-                #F00000 35%,
-                $color 70%
-            );
-        }
-
-        .bottom {
-            box-shadow: 0 0 50px 10px #F006;
-        }
-    }
+  }
 }
 
-#button-8 {
-    --button-diameter: calc(var(--circle-diameter) * 0.6);
-    $color: #00008C;
+#big-blue-button {
+  --button-diameter: calc(var(--circle-diameter) * 0.6);
+  $color: #00008C;
 
+  .top {
+    background: radial-gradient(circle,
+      $color 0%,
+      $color 50%,
+      darken($color, 5%) 70%
+    );
+    border-color: darken($color, 15%);
+  }
+
+  .side {
+    background-color: darken($color, 5%);
+  }
+
+  &.playing {
     .top {
-        background: radial-gradient(circle,
-            $color 0%,
-            $color 50%,
-            darken($color, 5%) 70%
-        );
-        border-color: darken($color, 15%);
+      background: radial-gradient(circle,
+        #22F 0%,
+        #11F 30%,
+        #0000C8 45%,
+        $color 70%
+      );
     }
 
-    .side {
-        background-color: darken($color, 5%);
+    .bottom {
+      box-shadow: 0 0 40px 10px #22f6;
     }
-
-    &.playing {
-        .top {
-            background: radial-gradient(circle,
-                #22F 0%,
-                #11F 30%,
-                #0000C8 45%,
-                $color 70%
-            );
-        }
-
-        .bottom {
-            box-shadow: 0 0 40px 10px #22f6;
-        }
-    }
+  }
 }
 
 #connect-button {
-    color: #ccc;
-    --index: -1;
-    transition: color 400ms, text-shadow 400ms;
+  color: #ccc;
+  --index: -1;
+  transition: color 400ms, text-shadow 400ms;
 
-    .top {
-        padding: 0 0 0 calc(var(--circle-diameter) * 0.005);
-        background: #151515;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-    }
+  .top {
+    padding: 0 0 0 calc(var(--circle-diameter) * 0.005);
+    background: #151515;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
 
-    .side {
-        background: #111;
-    }
+  .side {
+    background: #111;
+  }
 
-    &:disabled {
-        $bluetooth-color: #0082fc;
-        color: $bluetooth-color;
-        text-shadow: 0 0 20px $bluetooth-color;
-        cursor: default;
-    }
+  &:disabled {
+    $bluetooth-color: #0082fc;
+    color: $bluetooth-color;
+    text-shadow: 0 0 20px $bluetooth-color;
+    cursor: default;
+  }
 }
 
 #connect-button-icon {
-    font-size: calc(var(--circle-diameter) * 0.1);
+  font-size: calc(var(--circle-diameter) * 0.1);
 }
 
 $colors: (
-        0: #e00,
-        1: #ffa500,
-        2: #ee0,
-        3: green,
-        4: #00d,
-        5: #eee,
-        6: #282828
+  0: #e00,
+  1: #ffa500,
+  2: #ee0,
+  3: green,
+  4: #00d,
+  5: #eee,
+  6: #282828,
+);
+
+$ids: (
+  0: "red",
+  1: "orange",
+  2: "yellow",
+  3: "green",
+  4: "blue",
+  5: "white",
+  6: "black",
 );
 
 @for $i from 0 to 7 {
-    $color: map.get($colors, $i);
+  $color: map.get($colors, $i);
 
-    #button-#{$i} {
-        --index: #{$i};
+  ##{map.get($ids, $i)}-button {
+    --index: #{$i};
 
-        .top {
-            background: radial-gradient(circle,
-                lighten($color, 2%) 0%,
-                lighten($color, 2%) 40%,
-                $color 40%,
-                darken($color, 5%) 100%
-            );
-        }
+    .top {
+      background: radial-gradient(circle,
+        lighten($color, 2%) 0%,
+        lighten($color, 2%) 40%,
+        $color 40%,
+        darken($color, 5%) 100%
+      );
     }
+  }
 }
 
 @for $i from 0 to 6 {
-    #button-#{$i} .side {
-        background: darken(map.get($colors, $i), 15%);
-    }
+  ##{map.get($ids, $i)}-button .side {
+    background: darken(map.get($colors, $i), 15%);
+  }
 }
-#button-6 .side {
-    background: #161616;
+
+#black-button .side {
+  background: #161616;
 }
 
 @media (orientation: portrait) {
-    #buttons {
-        flex-direction: column;
-        --circle-diameter: min(min(50vh, 90vw), 500px);
-    }
+  #buttons {
+    flex-direction: column;
+    --circle-diameter: min(min(50vh, 90vw), 500px);
+  }
 
-    #buttons-right {
-        margin-left: 0;
-        margin-top: calc(var(--circle-diameter) * (-0.2));
-    }
+  #buttons-right {
+    margin-left: 0;
+    margin-top: calc(var(--circle-diameter) * (-0.2));
+  }
 
-    .small-button {
-        --base-rotation: 180deg;
-    }
+  .small-button {
+    --base-rotation: 180deg;
+  }
 }
 
 #controls {
-    position: fixed;
-    top: 0;
-    right: 0;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+  position: fixed;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 
-    .material-symbols-rounded {
-        font-size: 32px;
-    }
+  .material-symbols-rounded {
+    font-size: 32px;
+  }
 }
 
 #interaction-required {
-    animation: interactionRequired 2s infinite ease;
-    color: #E76F51;
+  animation: interactionRequired 2s infinite ease;
+  color: #E76F51;
 
-    @keyframes interactionRequired {
-        50% { opacity: 0.5; }
+  @keyframes interactionRequired {
+    50% {
+      opacity: 0.5;
     }
+  }
 
-    &.hidden {
-        display: none;
-    }
+  &.hidden {
+    display: none;
+  }
 }
 
 #fullscreen-button {
-    background: none;
-    border: none;
-    padding: 6px;
-    border-radius: 50%;
-    color: #fffb;
-    cursor: pointer;
-    margin: 4px;
-    width: 32px;
-    height: 32px;
-    box-sizing: content-box;
-    transition: background-color 200ms;
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 50%;
+  color: #fffb;
+  cursor: pointer;
+  margin: 4px;
+  width: 32px;
+  height: 32px;
+  box-sizing: content-box;
+  transition: background-color 200ms;
 
-    &:hover {
-        background: #fff2;
-    }
+  &:hover {
+    background: #fff2;
+  }
 }
 
 :fullscreen #fullscreen-button {
-    display: none;
+  display: none;
 }
 
 #config-dialog {
-    border: 5px solid black;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px 4px #0007;
-    font-family: sans-serif;
-    width: 500px;
+  border: 5px solid black;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px 4px #0007;
+  font-family: sans-serif;
+  width: 500px;
+  box-sizing: border-box;
+  max-width: calc(95vw - 10px);
+
+  &::backdrop {
+    background: #0009;
+  }
+
+  label {
+    font-size: 8pt;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  #config-dialog__config-input {
+    display: block;
+    width: 100%;
     box-sizing: border-box;
-    max-width: calc(95vw - 10px);
+    border: 3px solid #1C5253;
+    border-radius: 10px;
+    font-size: 12pt;
+    padding: 4px 8px;
+  }
 
-    &::backdrop {
-        background: #0009;
-    }
-
-    label {
-        font-size: 8pt;
-        font-weight: 500;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        display: block;
-        margin-bottom: 4px;
-    }
-
-    #config-dialog__config-input {
-        display: block;
-        width: 100%;
-        box-sizing: border-box;
-        border: 3px solid #1C5253;
-        border-radius: 10px;
-        font-size: 12pt;
-        padding: 4px 8px;
-    }
-
-    #config-dialog__submit {
-        display: block;
-        margin-top: 8px;
-        margin-left: auto;
-        background: #246A6B;
-        border: 5px solid #1C5253;
-        border-radius: 10px;
-        font-size: 12pt;
-        color: white;
-        padding: 6px 12px;
-        cursor: pointer;
-    }
+  #config-dialog__submit {
+    display: block;
+    margin-top: 8px;
+    margin-left: auto;
+    background: #246A6B;
+    border: 5px solid #1C5253;
+    border-radius: 10px;
+    font-size: 12pt;
+    color: white;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
 }
 
 #config-dialog-error {
-    background: #fbb;
-    border: #800 2px solid;
-    border-radius: 10px;
-    padding: 6px 12px;
-    margin-bottom: 10px;
+  background: #fbb;
+  border: #800 2px solid;
+  border-radius: 10px;
+  padding: 6px 12px;
+  margin-bottom: 10px;
 
-    &.hidden {
-        display: none;
-    }
+  &.hidden {
+    display: none;
+  }
 }
