@@ -117,7 +117,7 @@ export class Bluetooth {
     await this.connect(false);
   }
 
-  setButtonsLit(red: boolean, blue: boolean) {
+  setButtonLEDs(red: boolean, blue: boolean) {
     return gattQueue.enqueue(async () => {
       await this.redLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([+red]));
       await this.blueLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([+blue]));

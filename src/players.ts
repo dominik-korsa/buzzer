@@ -9,7 +9,7 @@ export abstract class Player {
 
   protected createAudio(src: URL) {
     const audio = new Audio(src.toString());
-    audio.addEventListener('playing', () => { this.startListeners.forEach((l) => l()) });
+    audio.addEventListener('play', () => { this.startListeners.forEach((l) => l()) });
     audio.addEventListener('ended', () => { this.endListeners.forEach((l) => l()) });
     return audio;
   }

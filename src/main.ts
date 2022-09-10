@@ -56,7 +56,7 @@ export async function run(config: Config) {
     const redPlaying = redPlayingCount > 0;
     const bluePlaying = bluePlayingCount > 0;
 
-    await bluetooth.setButtonsLit(redPlaying, bluePlaying);
+    await bluetooth.setButtonLEDs(redPlaying, bluePlaying);
 
     document.getElementById('big-red-button')!
       .classList[redPlaying ? 'add' : 'remove']('playing');
