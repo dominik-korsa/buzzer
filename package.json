@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "build": "sass style.scss style.css",
-    "dev": "sass style.scss style.css --watch"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -15,6 +16,15 @@
   "homepage": "https://github.com/dominik-korsa/buzzer#readme",
   "private": true,
   "dependencies": {
-    "sass": "^1.54.0"
-  }
+    "js-yaml": "^4.1.0",
+    "vite": "^3.1.0"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "@types/dom-screen-wake-lock": "^1.0.0",
+    "@types/js-yaml": "^4.0.5",
+    "@types/web-bluetooth": "^0.0.15",
+    "typescript": "^4.8.3"
+  },
+  "type": "module"
 }

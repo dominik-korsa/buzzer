@@ -7,5 +7,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="minify.json" level="application" />
     <orderEntry type="library" name="js-yaml" level="application" />
+    <orderEntry type="library" name="OpenSCAD Libraries" level="application" />
   </component>
 </module>

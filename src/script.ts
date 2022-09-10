@@ -1,30 +1,19 @@
-const connectButton = document.getElementById('connect-button');
-const connectButtonIcon = document.getElementById('connect-button-icon');
+import jsyaml from 'js-yaml';
 
-let buttons = [];
+const connectButton = document.getElementById('connect-button') as HTMLButtonElement;
+const connectButtonIcon = document.getElementById('connect-button-icon')!;
 
-const gattQueue = {
-    handlers: [],
-    async handleAll() {
-        for (let i = 0; i < this.handlers.length; i++) {
-            const {handler, resolve, reject} = this.handlers[i];
-            try {
-                resolve(await handler());
-            } catch (error) {
-                reject(error);
-            }
-        }
-        this.handlers = [];
-    },
-    enqueue(handler) {
-        return new Promise((resolve, reject) => {
-            this.handlers.push({ handler, resolve, reject });
-            if (this.handlers.length === 1) this.handleAll().catch(console.error);
-        });
-    },
-};
+interface Button {
+    players: HTMLAudioElement[];
+    nextSound: number;
+    mode: 'random' | 'sequence';
+}
 
-function playSound(index) {
+let buttons: Button[] = [];
+
+const gattQueue = new PromiseQueue();
+
+async function playSound(index: number) {
     const button = buttons[index];
     if (button.players.length === 0) {
         console.warn(`No player for ${index}`);
@@ -32,7 +21,7 @@ function playSound(index) {
     }
     const player = button.players[button.nextSound];
     player.currentTime = 0;
-    player.play();
+    await player.play();
     if (button.mode === 'random') {
         button.nextSound = Math.floor(Math.random() * button.players.length);
     } else {
@@ -41,7 +30,7 @@ function playSound(index) {
 }
 
 for (let i = 0; i < 9; ++i) {
-    let button = document.getElementById(`button-${i}`);
+    let button = document.getElementById(`button-${i}`) as HTMLButtonElement;
     button.addEventListener('pointerdown', (event) => {
         if (event.pointerType === 'mouse' && event.button !== 0) return;
         button.classList.add('pressed');
@@ -55,8 +44,8 @@ for (let i = 0; i < 9; ++i) {
     button.addEventListener('pointerup', () => {
         button.classList.remove('pressed');
     });
-    button.addEventListener('contextmenu', () => {
-        if (event.pointerType !== 'mouse') event.preventDefault();
+    button.addEventListener('contextmenu', (event) => {
+        if ((event as PointerEvent).pointerType !== 'mouse') event.preventDefault();
     });
     let spacePressed = false;
     let enterPressed = false;
@@ -78,42 +67,43 @@ for (let i = 0; i < 9; ++i) {
 let redPlayingCount = 0;
 let bluePlayingCount = 0;
 
-let redLedCharacteristic = null;
-let blueLedCharacteristic = null;
+let redLedCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
+let blueLedCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
 
 async function updateLEDs() {
     const redPlaying = redPlayingCount > 0;
     const bluePlaying = bluePlayingCount > 0;
 
     await gattQueue.enqueue(async () => {
-        await redLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([ redPlaying ]));
-        await blueLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([ bluePlaying ]));
+        await redLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([ +redPlaying ]));
+        await blueLedCharacteristic?.writeValueWithoutResponse(new Uint8Array([ +bluePlaying ]));
     });
 
-    document.getElementById('button-7')
+    document.getElementById('button-7')!
         .classList[redPlaying ? 'add' : 'remove']('playing');
-    document.getElementById('button-8')
+    document.getElementById('button-8')!
         .classList[bluePlaying ? 'add' : 'remove']('playing');
 }
 
-let wakeLock = null;
+let wakeLock: WakeLockSentinel | null = null;
 
-async function connect(prompt) {
+async function connect(prompt: boolean) {
     console.log('Connecting...');
     try {
-        let server = null;
+        let server: BluetoothRemoteGATTServer | null = null;
         try {
             const devices = await navigator.bluetooth.getDevices();
             if (devices.length > 0) {
                 const device = devices[0];
                 console.log(device);
-                const promise = new Promise((resolve, reject) => {
+                const promise = new Promise<void>((resolve, reject) => {
                     const listener = () => {
                         clearTimeout(timeoutId);
                         console.log('Advertisement received');
                         resolve();
+                        device.removeEventListener('advertisementreceived', listener);
                     };
-                    device.addEventListener('advertisementreceived', listener, { once: true });
+                    device.addEventListener('advertisementreceived', listener);
                     let timeoutId = setTimeout(() => {
                         device.removeEventListener('advertisementreceived', listener);
                         reject(new Error('Timeout waiting for advertisement'));
@@ -125,7 +115,7 @@ async function connect(prompt) {
                 } catch (error) {
                     console.warn(error);
                 }
-                server = await device.gatt.connect();
+                server = await device.gatt?.connect() ?? null;
                 device.addEventListener('gattserverdisconnected', onDisconnect);
                 console.log('GATT server connected');
             }
@@ -141,14 +131,14 @@ async function connect(prompt) {
                 return;
             }
             console.log(device);
-            server = await device.gatt.connect();
+            server = await device.gatt?.connect() ?? null;
             device.addEventListener('gattserverdisconnected', onDisconnect);
             console.log('GATT server connected after prompt');
         }
 
         if (!server) return;
         const service = await server.getPrimaryService('9877867b-0423-41db-a5ab-28d28f73e179');
-        let buttonsCharacteristic;
+        let buttonsCharacteristic: BluetoothRemoteGATTCharacteristic;
         [
             buttonsCharacteristic,
             redLedCharacteristic,
@@ -160,7 +150,7 @@ async function connect(prompt) {
         ].map((uuid) => service.getCharacteristic(uuid)));
         await buttonsCharacteristic.startNotifications();
         buttonsCharacteristic.addEventListener('characteristicvaluechanged', () => {
-            onValueChange(buttonsCharacteristic.value);
+            onValueChange(buttonsCharacteristic.value!);
         });
         console.log('Notifications started');
 
@@ -179,7 +169,7 @@ async function connect(prompt) {
     }
 }
 
-function getLitBytes(number) {
+function getLitBytes(number: number) {
     let litBytes = [];
     for (let i = 0; number; ++i) {
         if (number % 2) litBytes.push(i);
@@ -188,18 +178,16 @@ function getLitBytes(number) {
     return litBytes;
 }
 
-const formatter = new Intl.ListFormat('en', {style: 'long', type: 'conjunction'});
-
 let previousValue = 0;
 
-function onValueChange(dataView) {
+function onValueChange(dataView: DataView) {
     const value = dataView.getUint16(0, true);
     getLitBytes(value & (previousValue ^ value)).forEach((i) => {
         playSound(i);
-        document.getElementById(`button-${i}`).classList.add('pressed');
+        document.getElementById(`button-${i}`)!.classList.add('pressed');
     });
     getLitBytes(previousValue & (previousValue ^ value)).forEach((i) => {
-        document.getElementById(`button-${i}`).classList.remove('pressed');
+        document.getElementById(`button-${i}`)!.classList.remove('pressed');
     });
     previousValue = value;
 }
@@ -216,13 +204,13 @@ async function onDisconnect() {
     await connect(false);
 }
 
-const configDialog = document.getElementById('config-dialog');
-const configHistory = document.getElementById('config-dialog__history');
+const configDialog = document.getElementById('config-dialog') as HTMLDialogElement;
+const configHistory = document.getElementById('config-dialog__history')!;
 configDialog.addEventListener('cancel', (event) => { event.preventDefault(); });
-function showConfigWithError(message, details = '') {
-    document.getElementById('config-dialog-error').classList.remove('hidden');
-    document.getElementById('config-dialog-error__message').innerText = message;
-    document.getElementById('config-dialog-error__details').innerText = details;
+function showConfigWithError(message: unknown, details: unknown = '') {
+    document.getElementById('config-dialog-error')!.classList.remove('hidden');
+    document.getElementById('config-dialog-error__message')!.innerText = message instanceof Error ? message.message : `${message}`;
+    document.getElementById('config-dialog-error__details')!.innerText = details instanceof Error ? details.message : `${details}`;
     configDialog.showModal();
 }
 async function loadConfig() {
@@ -243,11 +231,11 @@ async function loadConfig() {
         data = jsyaml.load(await response.text());
     } catch (error) {
         console.error(error);
-        showConfigWithError('Cannot load configuration', error.message);
+        showConfigWithError('Cannot load configuration', error);
         return;
     }
     const history = JSON.parse(localStorage.getItem('config-history') ?? '[]')
-        .filter((url) => url !== configUrl);
+        .filter((url: string) => url !== configUrl);
     history.unshift(configUrl);
     localStorage.setItem('config-history', JSON.stringify(history));
 
@@ -256,7 +244,7 @@ async function loadConfig() {
     else if (data.sounds.length !== 9) showConfigWithError(`\`sounds\` array should have 9 items (currently has ${data.sounds.length})`);
     else try {
         buttons = data.sounds.map((entry, index) => {
-            const button = document.getElementById(`button-${index}`);
+            const button = document.getElementById(`button-${index}`)!;
             if (!entry) entry = { src: [] };
             if (!entry.src) entry.src = [];
             if (typeof entry.src === 'string') entry.src = [entry.src];
@@ -279,13 +267,13 @@ async function loadConfig() {
             });
         }));
         return true;
-    } catch (error) { showConfigWithError(error.message); }
+    } catch (error) { showConfigWithError(error); }
     return false;
 }
 
 async function start() {
     const history = JSON.parse(localStorage.getItem('config-history') ?? '[]');
-    history.forEach((url) => {
+    history.forEach((url: string) => {
         const link = configHistory
             .appendChild(document.createElement('li'))
             .appendChild(document.createElement('a'));
@@ -305,10 +293,10 @@ start().catch(console.error);
 const resizeObserver = new ResizeObserver(entries => {
     document.documentElement.style.setProperty('--win-height', `${entries[0].target.clientHeight - 1}px`);
 });
-resizeObserver.observe(document.getElementById('content'));
+resizeObserver.observe(document.getElementById('content')!);
 
-const goFullscreen = () => document.documentElement.requestFullscreen();
+export const goFullscreen = () => document.documentElement.requestFullscreen();
 
 document.addEventListener('click', () => {
-    document.getElementById('interaction-required').classList.add('hidden');
+    document.getElementById('interaction-required')!.classList.add('hidden');
 }, { once: true });
