@@ -99,7 +99,7 @@ class BasicPlayerSingle {
     this.audio.play().catch(console.error);
   }
 
-  release(cancel: boolean) {
+  finish(cancel: boolean) {
     clearTimeout(this.timeoutId);
     this.timeoutId = undefined;
     this.nextLoopDelay = null;
@@ -131,13 +131,13 @@ export abstract class BasicPlayer extends Player {
 
   cancel() {
     this.audio.forEach((el) => {
-      el.release(true);
+      el.finish(true);
     });
   }
 
   handleRelease() {
     this.audio.forEach((el) => {
-      el.release(false);
+      el.finish(false);
     });
   }
 }

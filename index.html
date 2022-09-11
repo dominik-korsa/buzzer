@@ -1,108 +1,108 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Buzzer</title>
-    <script src="src/index.ts" defer type="module"></script>
-    <link href="src/style.scss" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <style>
-        .material-symbols-rounded {
-            font-variation-settings:
-                    'FILL' 0,
-                    'wght' 400,
-                    'GRAD' 0,
-                    'opsz' 48
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Buzzer</title>
+  <script src="src/index.ts" defer type="module"></script>
+  <link href="src/style.scss" rel="stylesheet">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <style>
+    .material-symbols-rounded {
+      font-variation-settings: 'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 48
+    }
+  </style>
 </head>
 <body>
 <dialog id="config-dialog">
-    <ul id="config-dialog__history"></ul>
-    <div id="config-dialog-error" class="hidden">
-        <div id="config-dialog-error__message"></div>
-        <samp id="config-dialog-error__details"></samp>
-    </div>
-    <form>
-        <label for="config-dialog__config-input">Configuration URL</label>
-        <input id="config-dialog__config-input" name="config" type="url" required autofocus>
-        <button id="config-dialog__submit" type="submit">Load</button>
-    </form>
+  <ul id="config-dialog__history"></ul>
+  <div id="config-dialog-error" class="hidden">
+    <div id="config-dialog-error__message"></div>
+    <samp id="config-dialog-error__details"></samp>
+  </div>
+  <form>
+    <label for="config-dialog__config-input">Configuration URL</label>
+    <input id="config-dialog__config-input" name="config" type="url" required autofocus>
+    <button id="config-dialog__submit" type="submit">Load</button>
+  </form>
 </dialog>
 <div id="content">
-    <div id="buttons">
-        <div id="buttons-left">
-            <button id="big-red-button" class="big-button button">
-                <span class="top"></span>
-                <span class="side"></span>
-                <span class="bottom"></span>
-            </button>
-        </div>
-        <div id="buttons-right">
-            <button id="big-blue-button" class="big-button button">
-                <span class="top"></span>
-                <span class="side"></span>
-                <span class="bottom"></span>
-            </button>
-            <button id="connect-button" class="small-button button">
-                <span class="top">
-                    <span class="material-symbols-rounded" id="connect-button-icon">
-                        bluetooth
-                    </span>
-                </span>
-                <span class="side"></span>
-                <span class="bottom"></span>
-            </button>
-            <button class="small-button button" id="red-button">
-                <span class="top"></span>
-                <span class="side"></span>
-                <span class="bottom"></span>
-            </button>
-            <button class="small-button button" id="orange-button">
-                <span class="top"></span>
-                <span class="side"></span>
-                <span class="bottom"></span>
-            </button>
-            <button class="small-button button" id="yellow-button">
-                <span class="top"></span>
-                <span class="side"></span>
-                <span class="bottom"></span>
-            </button>
-            <button class="small-button button" id="green-button">
-                <span class="top"></span>
-                <span class="side"></span>
-                <span class="bottom"></span>
-            </button>
-            <button class="small-button button" id="blue-button">
-                <span class="top"></span>
-                <span class="side"></span>
-                <span class="bottom"></span>
-            </button>
-            <button class="small-button button" id="white-button">
-                <span class="top"></span>
-                <span class="side"></span>
-                <span class="bottom"></span>
-            </button>
-            <button class="small-button button" id="black-button">
-                <span class="top"></span>
-                <span class="side"></span>
-                <span class="bottom"></span>
-            </button>
-        </div>
+  <div id="buttons">
+    <div id="buttons-left">
+      <button id="big-red-button" class="big-button button">
+        <span class="top"></span>
+        <span class="side"></span>
+        <span class="bottom"></span>
+      </button>
     </div>
+    <div id="buttons-right">
+      <button id="big-blue-button" class="big-button button">
+        <span class="top"></span>
+        <span class="side"></span>
+        <span class="bottom"></span>
+      </button>
+      <button id="connect-button" class="small-button button">
+        <span class="top">
+          <span class="material-symbols-rounded" id="connect-button-icon">
+            bluetooth
+          </span>
+        </span>
+        <span class="side"></span>
+        <span class="bottom"></span>
+      </button>
+      <button class="small-button button" id="red-button">
+        <span class="top"></span>
+        <span class="side"></span>
+        <span class="bottom"></span>
+      </button>
+      <button class="small-button button" id="orange-button">
+        <span class="top"></span>
+        <span class="side"></span>
+        <span class="bottom"></span>
+      </button>
+      <button class="small-button button" id="yellow-button">
+        <span class="top"></span>
+        <span class="side"></span>
+        <span class="bottom"></span>
+      </button>
+      <button class="small-button button" id="green-button">
+        <span class="top"></span>
+        <span class="side"></span>
+        <span class="bottom"></span>
+      </button>
+      <button class="small-button button" id="blue-button">
+        <span class="top"></span>
+        <span class="side"></span>
+        <span class="bottom"></span>
+      </button>
+      <button class="small-button button" id="white-button">
+        <span class="top"></span>
+        <span class="side"></span>
+        <span class="bottom"></span>
+      </button>
+      <button class="small-button button" id="black-button">
+        <span class="top"></span>
+        <span class="side"></span>
+        <span class="bottom"></span>
+      </button>
+    </div>
+  </div>
 </div>
 <div id="controls">
-    <span class="material-symbols-rounded" id="interaction-required" title="Interaction required">
-        touch_app
+  <span class="material-symbols-rounded" id="interaction-required" title="Interaction required">
+    touch_app
+  </span>
+  <button id="fullscreen-button">
+    <span class="material-symbols-rounded" title="Go fullscreen">
+      fullscreen
     </span>
-    <button id="fullscreen-button">
-        <span class="material-symbols-rounded">
-            fullscreen
-        </span>
-    </button>
+  </button>
 </div>
 </body>
 </html>
