@@ -135,7 +135,11 @@ export abstract class BasicPlayer extends Player {
     });
   }
 
-  handleRelease() {}
+  handleRelease() {
+    this.audio.forEach((el) => {
+      el.release(false);
+    });
+  }
 }
 
 export class SequencePlayer extends BasicPlayer {
@@ -185,13 +189,15 @@ export class PressReleasePlayer extends Player {
   handlePress() {
     this.isPressed = true;
     this.pressPlayer.handlePress();
-    if (this.releasePlayer) this.releasePlayer.cancel();
+    if (this.cancelRelease) this.releasePlayer.cancel();
+    else this.releasePlayer.handleRelease();
   }
 
   handleRelease() {
     this.isPressed = false;
     this.releasePlayer.handlePress();
     if (this.cancelPress) this.pressPlayer.cancel();
+    else this.pressPlayer.handleRelease();
   }
 
   cancel() {
