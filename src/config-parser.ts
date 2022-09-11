@@ -27,6 +27,7 @@ export interface PressReleaseSound {
   cancelPress: boolean;
   pressLoop: Loop | null;
   cancelRelease: boolean;
+  releaseMinTime: number;
 }
 
 export type Sound = BasicSound | NoSound | PressReleaseSound;
@@ -62,6 +63,7 @@ export function parseConfig(inputConfig: ConfigSchema, configUrl: string): Confi
           cancelPress: inputSound.press?.cancel ?? true,
           pressLoop: parseLoop(inputSound.press?.loop ?? null),
           cancelRelease: inputSound.release?.cancel ?? true,
+          releaseMinTime: inputSound.release?.minTime ?? 0,
           name: inputSound.name || 'Press & release sound'
         };
       }

@@ -68,7 +68,6 @@ async function start() {
 
   const config = await loadConfig();
   if (config === null) return;
-  console.log(config);
   await run(config);
 }
 

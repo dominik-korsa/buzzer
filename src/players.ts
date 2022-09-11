@@ -71,20 +71,20 @@ class BasicPlayerSingle {
       if (this.nextLoopDelay === null) return;
       clearTimeout(this.timeoutId);
       this.timeoutId = window.setTimeout(() => {
-        this.audio.currentTime = loop.startTime;
+        this.audio.currentTime = loop.startTime / 1000;
         this.audio.play().catch(console.error);
         clearTimeout(this.timeoutId)
         this.timeoutId = undefined;
-      }, this.nextLoopDelay * 1000)
+      }, this.nextLoopDelay)
       this.nextLoopDelay *= loop.delayChange;
     });
 
     if (loop.delay < 0) {
       this.audio.addEventListener('timeupdate', () => {
         if (this.timeoutId !== undefined || this.nextLoopDelay === null) return;
-        let ahead = this.audio.currentTime - this.audio.duration - loop.delay;
+        let ahead = this.audio.currentTime - this.audio.duration - loop.delay / 1000;
         if (ahead >= 0) {
-          this.audio.currentTime = loop.startTime === 0 ? 0 : loop.startTime + ahead;
+          this.audio.currentTime = loop.startTime === 0 ? 0 : loop.startTime / 1000 + ahead;
           this.audio.play().catch(console.error)
         }
       });
@@ -169,13 +169,15 @@ export class PressReleasePlayer extends Player {
 
   private readonly cancelPress: boolean;
   private readonly cancelRelease: boolean;
+  private readonly releaseMinTime: number;
 
-  private isPressed = false;
+  private pressedSince: number | null = null;
 
   constructor(sound: PressReleaseSound) {
     super();
     this.cancelPress = sound.cancelPress;
     this.cancelRelease = sound.cancelRelease;
+    this.releaseMinTime = sound.releaseMinTime;
 
     this.pressPlayer = createPlayer(sound.press, sound.pressLoop);
     this.releasePlayer = createPlayer(sound.release, null);
@@ -187,21 +189,22 @@ export class PressReleasePlayer extends Player {
   }
 
   handlePress() {
-    this.isPressed = true;
+    this.pressedSince = Date.now();
     this.pressPlayer.handlePress();
     if (this.cancelRelease) this.releasePlayer.cancel();
     else this.releasePlayer.handleRelease();
   }
 
   handleRelease() {
-    this.isPressed = false;
+    if (this.pressedSince !== null && Date.now() - this.pressedSince >= this.releaseMinTime)
     this.releasePlayer.handlePress();
+    this.pressedSince = null;
     if (this.cancelPress) this.pressPlayer.cancel();
     else this.pressPlayer.handleRelease();
   }
 
   cancel() {
-    this.isPressed = false;
+    this.pressedSince = null;
     this.pressPlayer.cancel();
     this.releasePlayer.cancel();
   }
