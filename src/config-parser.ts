@@ -1,4 +1,4 @@
-import { BasicSoundSchema, ButtonId, buttonIds, ConfigSchema } from "./config-schema.js";
+import { BasicSoundSchema, ButtonId, buttonIds, ConfigSchema, LoopSchema } from "./config-schema.js";
 import { mapKeys } from "./utils.js";
 
 export interface Config {
@@ -14,12 +14,18 @@ export interface BasicSound {
   mode: 'sequence' | 'random';
 }
 
+export interface Loop {
+  startTime: number;
+  delay: number;
+  delayChange: number;
+}
+
 export interface PressReleaseSound {
   mode: 'press-release';
   press: BasicSound | NoSound;
   release: BasicSound | NoSound;
   cancelPress: boolean;
-  loopPress: boolean;
+  pressLoop: Loop | null;
   cancelRelease: boolean;
 }
 
@@ -34,6 +40,15 @@ function parseBasicSound(inputSound: BasicSoundSchema, configUrl: string) {
   }
 }
 
+export function parseLoop(loopConfig: LoopSchema | null): Loop | null {
+  if (loopConfig === null) return null;
+  return {
+    startTime: loopConfig.startTime ?? 0,
+    delay: loopConfig.delay ?? 0,
+    delayChange: loopConfig.delayChange ?? 1,
+  }
+}
+
 export function parseConfig(inputConfig: ConfigSchema, configUrl: string): Config {
   return {
     sounds: mapKeys(buttonIds, (id): NamedSound => {
@@ -45,7 +60,7 @@ export function parseConfig(inputConfig: ConfigSchema, configUrl: string): Confi
           press: inputSound.press ? parseBasicSound(inputSound.press, configUrl) : { mode: 'none' },
           release: inputSound.release ? parseBasicSound(inputSound.release, configUrl) : { mode: 'none' },
           cancelPress: inputSound.press?.cancel ?? true,
-          loopPress: inputSound.press?.loop ?? false,
+          pressLoop: parseLoop(inputSound.press?.loop ?? null),
           cancelRelease: inputSound.release?.cancel ?? true,
           name: inputSound.name || 'Press & release sound'
         };

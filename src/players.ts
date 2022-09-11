@@ -1,4 +1,4 @@
-import { BasicSound, PressReleaseSound, Sound } from "./config-parser.js";
+import { BasicSound, Loop, PressReleaseSound, Sound } from "./config-parser.js";
 
 export abstract class Player {
   private readonly startListeners: (() => void)[] = [];
@@ -20,45 +20,119 @@ export abstract class Player {
     this.endListeners.forEach((l) => l());
   }
 
-  protected createAudio(src: URL, loop: boolean) {
-    const audio = new Audio(src.toString());
-    audio.addEventListener('play', () => { this.emitStart(); });
-    audio.addEventListener('pause', () => { this.emitEnd(); });
-    if (loop) {
-      audio.addEventListener('timeupdate', () => {
-        const buffer = 0.3
-        if (audio.currentTime > audio.duration - buffer) {
-          audio.currentTime = 0
-          audio.play().catch(console.error)
-        }
-      })
-    }
-    return audio;
-  }
-
   abstract handlePress(): void;
   abstract handleRelease(): void;
   abstract cancel(): void;
 }
 
-export abstract class BasicPlayer extends Player {
-  private readonly audio: HTMLAudioElement[];
+class BasicPlayerSingle {
+  private readonly audio: HTMLAudioElement;
+  private readonly loop: Loop | null;
+  private nextLoopDelay: null | number = null;
+  private lastEmitted = false;
+  private timeoutId: number | undefined;
 
-  constructor(sound: BasicSound, loop: boolean) {
+  private readonly startListeners: (() => void)[] = [];
+  private readonly endListeners: (() => void)[] = [];
+
+  public onStart(handler: () => void) {
+    this.startListeners.push(handler);
+  }
+
+  public onEnd(handler: () => void) {
+    this.endListeners.push(handler);
+  }
+
+  private emitStart() {
+    if (this.lastEmitted) return;
+    this.lastEmitted = true;
+    this.startListeners.forEach((l) => l());
+  }
+
+  private emitEnd() {
+    if (!this.lastEmitted) return;
+    this.lastEmitted = false;
+    this.endListeners.forEach((l) => l());
+  }
+
+  constructor(src: URL, loop: Loop | null) {
+    this.loop = loop;
+    this.audio = new Audio(src.toString());
+    this.audio.addEventListener('play', () => {
+      this.emitStart();
+    });
+    this.audio.addEventListener('pause', () => {
+      if (this.nextLoopDelay !== null) return;
+      this.emitEnd();
+    });
+
+    if (!loop) return;
+    this.audio.addEventListener('ended', () => {
+      if (this.nextLoopDelay === null) return;
+      clearTimeout(this.timeoutId);
+      this.timeoutId = window.setTimeout(() => {
+        this.audio.currentTime = loop.startTime;
+        this.audio.play().catch(console.error);
+        clearTimeout(this.timeoutId)
+        this.timeoutId = undefined;
+      }, this.nextLoopDelay * 1000)
+      this.nextLoopDelay *= loop.delayChange;
+    });
+
+    if (loop.delay < 0) {
+      this.audio.addEventListener('timeupdate', () => {
+        if (this.timeoutId !== undefined || this.nextLoopDelay === null) return;
+        let ahead = this.audio.currentTime - this.audio.duration - loop.delay;
+        if (ahead >= 0) {
+          this.audio.currentTime = loop.startTime === 0 ? 0 : loop.startTime + ahead;
+          this.audio.play().catch(console.error)
+        }
+      });
+    }
+  }
+
+  play() {
+    clearTimeout(this.timeoutId);
+    this.timeoutId = undefined;
+    this.nextLoopDelay = this.loop?.delay ?? null;
+    this.audio.currentTime = 0;
+    this.audio.play().catch(console.error);
+  }
+
+  release(cancel: boolean) {
+    clearTimeout(this.timeoutId);
+    this.timeoutId = undefined;
+    this.nextLoopDelay = null;
+    if (this.audio.paused) this.emitEnd();
+    if (cancel) {
+      this.audio.currentTime = 0;
+      this.audio.pause();
+    }
+  }
+}
+
+export abstract class BasicPlayer extends Player {
+  private readonly audio: BasicPlayerSingle[];
+
+  constructor(sound: BasicSound, loop: Loop | null) {
     super();
-    this.audio = sound.src.map((src) => this.createAudio(src, loop));
+    this.audio = sound.src.map((src) => new BasicPlayerSingle(src, loop));
+    this.audio.forEach((audio) => {
+      audio.onStart(() => { this.emitStart(); });
+      audio.onEnd(() => { this.emitEnd(); });
+    });
   }
 
   protected get audioCount() { return this.audio.length };
 
   protected play(i: number) {
-    const audio = this.audio[i];
-    audio.currentTime = 0;
-    audio.play().catch(console.error);
+    this.audio[i].play();
   }
 
   cancel() {
-    this.audio.forEach((el) => { el.pause(); });
+    this.audio.forEach((el) => {
+      el.release(true);
+    });
   }
 
   handleRelease() {}
@@ -99,8 +173,8 @@ export class PressReleasePlayer extends Player {
     this.cancelPress = sound.cancelPress;
     this.cancelRelease = sound.cancelRelease;
 
-    this.pressPlayer = createPlayer(sound.press, sound.loopPress);
-    this.releasePlayer = createPlayer(sound.release, false);
+    this.pressPlayer = createPlayer(sound.press, sound.pressLoop);
+    this.releasePlayer = createPlayer(sound.release, null);
 
     this.pressPlayer.onStart(() => { this.emitStart(); });
     this.releasePlayer.onStart(() => { this.emitStart() });
@@ -127,7 +201,7 @@ export class PressReleasePlayer extends Player {
   }
 }
 
-export function createPlayer(sound: Sound, loop: boolean): Player {
+export function createPlayer(sound: Sound, loop: Loop | null): Player {
   switch (sound.mode) {
     case "none": return new NoPlayer();
     case "sequence": return new SequencePlayer(sound, loop);

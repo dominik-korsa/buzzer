@@ -21,11 +21,17 @@ const cancellableBasicSoundSchema = IntersectAllOf([
   Type.Ref(basicSoundSchema),
 ], {$id: '#/$defs/cancellableBasicSound'})
 
+const loopSchema = Type.Partial(Type.Object({
+  startTime: Type.Number({ minimum: 0, description: 'Start time in seconds' }),
+  delay: Type.Number({ description: 'Delay before starting in seconds. If negative, restarts before playback end' }),
+  delayChange: Type.Number({ exclusiveMinimum: 0 }),
+}));
+
 const pressReleaseSoundSchema = Type.Object({
   press: Nullable(IntersectAllOf([
     Type.Partial(Type.Object({
       cancel: Type.Boolean(),
-      loop: Type.Boolean(),
+      loop: Nullable(loopSchema),
     })),
     Type.Ref(basicSoundSchema),
   ])),
@@ -57,7 +63,7 @@ const configSchema = Type.Object({
 });
 
 export type BasicSoundSchema = Static<typeof basicSoundSchema>;
-export type SoundSchema = Static<typeof soundSchema>;
+export type LoopSchema = Static<typeof loopSchema>;
 export type ConfigSchema = Static<typeof configSchema>;
 
 export const fullConfigSchema = {

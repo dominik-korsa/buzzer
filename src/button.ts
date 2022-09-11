@@ -56,7 +56,7 @@ export class Button {
     this.el = document.getElementById(`${id}-button`) as HTMLButtonElement;
     this.el.title = sound.name ?? 'No sound';
     this.initEvents();
-    this.player = createPlayer(sound, false);
+    this.player = createPlayer(sound, null);
   }
 
   public onStart(handler: () => void) { this.player?.onStart(handler); }
