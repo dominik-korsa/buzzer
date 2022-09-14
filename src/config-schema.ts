@@ -32,6 +32,14 @@ const pressReleaseSoundSchema = Type.Object({
     Type.Partial(Type.Object({
       cancel: Type.Boolean(),
       loop: Nullable(loopSchema),
+      minDuration: Type.Union([
+        Type.Null(),
+        Type.Integer({ minimum: 1 }),
+        Type.Object({
+          ifLessThan: Type.Integer({ minimum: 1 }),
+          playFor: Type.Integer({ minimum: 1 }),
+        }),
+      ])
     })),
     Type.Ref(basicSoundSchema),
   ])),

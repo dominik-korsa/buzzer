@@ -20,6 +20,11 @@ export interface Loop {
   delayChange: number;
 }
 
+export interface MinDuration {
+  ifLessThan: number;
+  playFor: number;
+}
+
 export interface PressReleaseSound {
   mode: 'press-release';
   press: BasicSound | NoSound;
@@ -28,6 +33,7 @@ export interface PressReleaseSound {
   pressLoop: Loop | null;
   cancelRelease: boolean;
   releaseMinTime: number;
+  pressMinDuration: null | MinDuration;
 }
 
 export type Sound = BasicSound | NoSound | PressReleaseSound;
@@ -56,6 +62,13 @@ export function parseConfig(inputConfig: ConfigSchema, configUrl: string): Confi
       const inputSound = inputConfig.sounds[id];
       if (inputSound === undefined) return { mode: 'none', name: 'No sound' };
       if ('press' in inputSound) {
+        let pressMinDuration: MinDuration | null = null;
+        if (typeof inputSound?.press?.minDuration === 'number') {
+          pressMinDuration = {
+            ifLessThan: inputSound.press.minDuration,
+            playFor: inputSound.press.minDuration,
+          }
+        } else if (inputSound?.press?.minDuration) pressMinDuration = inputSound.press.minDuration;
         return {
           mode: 'press-release',
           press: inputSound.press ? parseBasicSound(inputSound.press, configUrl) : { mode: 'none' },
@@ -64,7 +77,8 @@ export function parseConfig(inputConfig: ConfigSchema, configUrl: string): Confi
           pressLoop: parseLoop(inputSound.press?.loop ?? null),
           cancelRelease: inputSound.release?.cancel ?? true,
           releaseMinTime: inputSound.release?.minTime ?? 0,
-          name: inputSound.name || 'Press & release sound'
+          name: inputSound.name || 'Press & release sound',
+          pressMinDuration,
         };
       }
       const parsed = parseBasicSound(inputSound, configUrl);
