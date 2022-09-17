@@ -153,7 +153,7 @@ export class SequencePlayer extends BasicPlayer {
 
 export class RandomPlayer extends BasicPlayer {
   handlePress() {
-    this.play(Math.random() * this.audioCount)
+    this.play(Math.floor(Math.random() * this.audioCount));
   }
 }
 
