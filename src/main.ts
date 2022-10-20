@@ -8,6 +8,7 @@ export async function run(config: Config) {
   const connectButton = document.getElementById('connect-button') as HTMLButtonElement;
   const connectButtonIcon = document.getElementById('connect-button-icon')!;
   const fullscreenButton = document.getElementById('fullscreen-button') as HTMLButtonElement;
+  const labelsButton = document.getElementById('labels-button') as HTMLButtonElement;
   let wakeLock: WakeLockSentinel | null = null;
 
   const bluetooth = new Bluetooth({
@@ -67,6 +68,22 @@ export async function run(config: Config) {
   const goFullscreen = () => document.documentElement.requestFullscreen();
   connectButton.addEventListener('click', () => bluetooth.connect(true));
   fullscreenButton.addEventListener('click', () => goFullscreen());
+
+  let showLabels = JSON.parse(window.localStorage.getItem('show-labels') ?? 'false');
+  function updateLabels() {
+    const { classList } = document.body;
+    if (showLabels) classList.add('show-labels');
+    else classList.remove('show-labels');
+    window.localStorage.setItem('show-labels', JSON.stringify(showLabels));
+    labelsButton.querySelector('span')!.innerText = showLabels ? 'label' : 'label_off';
+    labelsButton.title = showLabels ? 'Hide button labels' : 'Show button labels';
+  }
+  updateLabels();
+
+  labelsButton.addEventListener('click', () => {
+    showLabels = !showLabels;
+    updateLabels();
+  });
 
   console.log('Starting...');
   await bluetooth.connect(false);

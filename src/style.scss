@@ -133,6 +133,21 @@ $left-buttons-padding: 0.05;
   transform: rotate(var(--actual-rotation)) translate(calc((var(--circle-diameter) - var(--button-diameter)) / -2)) rotate(calc(-1 * var(--actual-rotation)));
 }
 
+body:not(.show-labels) {
+  .button-label {
+    opacity: 0;
+  }
+}
+
+.button-label {
+  transition: opacity 300ms;
+
+  .label-text {
+    font-family: sans-serif;
+    fill: white;
+  }
+}
+
 .small-button-label {
   width: calc(var(--button-diameter) * 1.8);
   height: calc(var(--button-diameter) * 1.8);
@@ -142,8 +157,6 @@ $left-buttons-padding: 0.05;
 
   .label-text {
     font-size: 18px;
-    font-family: sans-serif;
-    fill: white;
     opacity: 0.8;
   }
 }
@@ -152,13 +165,9 @@ $left-buttons-padding: 0.05;
   --index: -1;
 }
 
-.big-button-label {
-  .label-text {
-    font-size: 12px;
-    font-family: sans-serif;
-    fill: white;
-    opacity: 0.7;
-  }
+.big-button-label .label-text {
+  font-size: 12px;
+  opacity: 0.7;
 }
 
 #big-red-button {
@@ -330,11 +339,30 @@ $ids: (
   .material-symbols-rounded {
     font-size: 32px;
   }
+
+  button {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 50%;
+    color: #fffb;
+    cursor: pointer;
+    margin: 4px 4px 4px 0;
+    width: 32px;
+    height: 32px;
+    box-sizing: content-box;
+    transition: background-color 200ms;
+
+    &:hover {
+      background: #fff2;
+    }
+  }
 }
 
 #interaction-required {
   animation: interactionRequired 2s infinite ease;
   color: #E76F51;
+  margin-right: 12px;
 
   @keyframes interactionRequired {
     50% {
@@ -344,24 +372,6 @@ $ids: (
 
   &.hidden {
     display: none;
-  }
-}
-
-#fullscreen-button {
-  background: none;
-  border: none;
-  padding: 6px;
-  border-radius: 50%;
-  color: #fffb;
-  cursor: pointer;
-  margin: 4px;
-  width: 32px;
-  height: 32px;
-  box-sizing: content-box;
-  transition: background-color 200ms;
-
-  &:hover {
-    background: #fff2;
   }
 }
 
