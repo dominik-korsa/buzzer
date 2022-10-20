@@ -45,6 +45,7 @@ $left-buttons-padding: 0.05;
   display: grid;
   align-items: center;
   justify-items: center;
+  --base-rotation: 90deg;
 
   > * {
     grid-row: 1;
@@ -121,13 +122,52 @@ $left-buttons-padding: 0.05;
   }
 }
 
-.small-button {
-  --max-offset-amount: 0.075;
-  --base-rotation: 90deg;
+.small-button, .small-button-label {
   --actual-rotation: calc(var(--base-rotation) + var(--index) * 36deg);
   --button-diameter: calc(var(--circle-diameter) * 0.15);
+}
+
+.small-button {
+  --max-offset-amount: 0.075;
   //noinspection CssInvalidFunction
   transform: rotate(var(--actual-rotation)) translate(calc((var(--circle-diameter) - var(--button-diameter)) / -2)) rotate(calc(-1 * var(--actual-rotation)));
+}
+
+body:not(.show-labels) {
+  .button-label {
+    opacity: 0;
+  }
+}
+
+.button-label {
+  transition: opacity 300ms;
+
+  .label-text {
+    font-family: sans-serif;
+    fill: white;
+  }
+}
+
+.small-button-label {
+  width: calc(var(--button-diameter) * 1.8);
+  height: calc(var(--button-diameter) * 1.8);
+  --actual-rotation: calc(var(--base-rotation) + var(--index) * 36deg);
+  //noinspection CssInvalidFunction
+  transform: rotate(var(--actual-rotation)) translate(calc((var(--circle-diameter) - var(--button-diameter)) / -2)) rotate(-90deg);
+
+  .label-text {
+    font-size: 18px;
+    opacity: 0.8;
+  }
+}
+
+#bluetooth-button-label {
+  --index: -1;
+}
+
+.big-button-label .label-text {
+  font-size: 12px;
+  opacity: 0.7;
 }
 
 #big-red-button {
@@ -249,9 +289,11 @@ $ids: (
 @for $i from 0 to 7 {
   $color: map.get($colors, $i);
 
-  ##{map.get($ids, $i)}-button {
+  ##{map.get($ids, $i)}-button, ##{map.get($ids, $i)}-button-label {
     --index: #{$i};
+  }
 
+  ##{map.get($ids, $i)}-button {
     .top {
       background: radial-gradient(circle,
         lighten($color, 2%) 0%,
@@ -282,9 +324,6 @@ $ids: (
   #buttons-right {
     margin-left: 0;
     margin-top: calc(var(--circle-diameter) * (-0.2));
-  }
-
-  .small-button {
     --base-rotation: 180deg;
   }
 }
@@ -300,11 +339,30 @@ $ids: (
   .material-symbols-rounded {
     font-size: 32px;
   }
+
+  button {
+    background: none;
+    border: none;
+    padding: 6px;
+    border-radius: 50%;
+    color: #fffb;
+    cursor: pointer;
+    margin: 4px 4px 4px 0;
+    width: 32px;
+    height: 32px;
+    box-sizing: content-box;
+    transition: background-color 200ms;
+
+    &:hover {
+      background: #fff2;
+    }
+  }
 }
 
 #interaction-required {
   animation: interactionRequired 2s infinite ease;
   color: #E76F51;
+  margin-right: 12px;
 
   @keyframes interactionRequired {
     50% {
@@ -314,24 +372,6 @@ $ids: (
 
   &.hidden {
     display: none;
-  }
-}
-
-#fullscreen-button {
-  background: none;
-  border: none;
-  padding: 6px;
-  border-radius: 50%;
-  color: #fffb;
-  cursor: pointer;
-  margin: 4px;
-  width: 32px;
-  height: 32px;
-  box-sizing: content-box;
-  transition: background-color 200ms;
-
-  &:hover {
-    background: #fff2;
   }
 }
 
