@@ -75,7 +75,6 @@ export async function run(config: Config) {
     if (showLabels) classList.add('show-labels');
     else classList.remove('show-labels');
     window.localStorage.setItem('show-labels', JSON.stringify(showLabels));
-    labelsButton.querySelector('span')!.innerText = showLabels ? 'label' : 'label_off';
     labelsButton.title = showLabels ? 'Hide button labels' : 'Show button labels';
   }
   updateLabels();

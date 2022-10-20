@@ -1,5 +1,12 @@
 @use "sass:map";
 
+.material-symbols-rounded {
+  font-variation-settings: 'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 48
+}
+
 body {
   background-color: #201E1F;
   width: 100%;
@@ -373,6 +380,10 @@ $ids: (
   &.hidden {
     display: none;
   }
+}
+
+body.show-labels #labels-button .material-symbols-rounded {
+  font-variation-settings: 'FILL' 1 !important;
 }
 
 :fullscreen #fullscreen-button {
