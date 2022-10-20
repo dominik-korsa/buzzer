@@ -36,14 +36,67 @@
   <div id="buttons">
     <div id="buttons-left">
       <button id="big-red-button" class="big-button button">
-        <span class="top"></span>
+        <span class="top">
+          <svg class="big-button-label" id="big-red-button-label" viewBox="-100 -100 200 200">
+            <defs>
+              <path d="M -90,0 a 90 90 180 1 0 180,0" id="big-blue-textcircle" />
+            </defs>
+
+            <text>
+              <textPath
+                xlink:href="#big-blue-textcircle"
+                class="label-text"
+                startOffset="50%"
+                text-anchor="middle"
+              />
+            </text>
+          </svg>
+        </span>
         <span class="side"></span>
         <span class="bottom"></span>
       </button>
     </div>
     <div id="buttons-right">
+      {{#*inline "button-label" }}
+        <svg class="small-button-label" id="{{name}}-button-label" viewBox="-100 -100 200 200">
+          <defs>
+            <path d="M -75,0 a 75 75 180 1 1 150,0" id="{{this}}-textcircle" />
+          </defs>
+
+          <text>
+            <textPath
+              xlink:href="#{{this}}-textcircle"
+              class="label-text"
+              startOffset="50%"
+              text-anchor="middle"
+            >
+              {{ text }}
+            </textPath>
+          </text>
+        </svg>
+      {{/inline}}
+      {{#each smallButtons}}
+        {{> button-label name=this }}
+      {{/each}}
+      {{> button-label name="bluetooth" text="Bluetooth" }}
+
       <button id="big-blue-button" class="big-button button">
-        <span class="top"></span>
+        <span class="top">
+          <svg class="big-button-label" id="big-blue-button-label" viewBox="-100 -100 200 200">
+            <defs>
+              <path d="M -90,0 a 90 90 180 1 0 180,0" id="big-blue-textcircle" />
+            </defs>
+
+            <text>
+              <textPath
+                xlink:href="#big-blue-textcircle"
+                class="label-text"
+                startOffset="50%"
+                text-anchor="middle"
+              />
+            </text>
+          </svg>
+        </span>
         <span class="side"></span>
         <span class="bottom"></span>
       </button>
@@ -63,28 +116,6 @@
           <span class="bottom"></span>
         </button>
       {{/each}}
-      {{#*inline "button-label" }}
-        <svg class="small-button-label" id="{{name}}-button-label" viewBox="-100 -100 200 200">
-          <defs>
-            <path d="M -75,0 a 75 75 180 1 1 150,0" id="textcircle" />
-          </defs>
-
-          <text>
-            <textPath
-              xlink:href="#textcircle"
-              class="label-text"
-              startOffset="50%"
-              text-anchor="middle"
-            >
-              {{ text }}
-            </textPath>
-          </text>
-        </svg>
-      {{/inline}}
-      {{#each smallButtons}}
-        {{> button-label name=this }}
-      {{/each}}
-      {{> button-label name="bluetooth" text="Bluetooth" }}
     </div>
   </div>
 </div>
