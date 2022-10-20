@@ -133,6 +133,10 @@ $left-buttons-padding: 0.05;
   transform: rotate(var(--actual-rotation)) translate(calc((var(--circle-diameter) - var(--button-diameter)) / -2)) rotate(calc(-1 * var(--actual-rotation)));
 }
 
+#bluetooth-button-label {
+  --index: -1;
+}
+
 .small-button-label {
   width: calc(var(--button-diameter) * 1.8);
   height: calc(var(--button-diameter) * 1.8);

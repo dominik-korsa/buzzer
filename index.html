@@ -63,8 +63,8 @@
           <span class="bottom"></span>
         </button>
       {{/each}}
-      {{#each smallButtons}}
-        <svg class="small-button-label" id="{{this}}-button-label" viewBox="-100 -100 200 200">
+      {{#*inline "button-label" }}
+        <svg class="small-button-label" id="{{name}}-button-label" viewBox="-100 -100 200 200">
           <defs>
             <path d="M -75,0 a 75 75 180 1 1 150,0" id="textcircle" />
           </defs>
@@ -74,11 +74,17 @@
               xlink:href="#textcircle"
               class="label-text"
               startOffset="50%"
-              text-anchor="middle">
+              text-anchor="middle"
+            >
+              {{ text }}
             </textPath>
           </text>
         </svg>
+      {{/inline}}
+      {{#each smallButtons}}
+        {{> button-label name=this }}
       {{/each}}
+      {{> button-label name="bluetooth" text="Bluetooth" }}
     </div>
   </div>
 </div>
