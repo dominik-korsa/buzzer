@@ -56,41 +56,13 @@
         <span class="side"></span>
         <span class="bottom"></span>
       </button>
-      <button class="small-button button" id="red-button">
-        <span class="top"></span>
-        <span class="side"></span>
-        <span class="bottom"></span>
-      </button>
-      <button class="small-button button" id="orange-button">
-        <span class="top"></span>
-        <span class="side"></span>
-        <span class="bottom"></span>
-      </button>
-      <button class="small-button button" id="yellow-button">
-        <span class="top"></span>
-        <span class="side"></span>
-        <span class="bottom"></span>
-      </button>
-      <button class="small-button button" id="green-button">
-        <span class="top"></span>
-        <span class="side"></span>
-        <span class="bottom"></span>
-      </button>
-      <button class="small-button button" id="blue-button">
-        <span class="top"></span>
-        <span class="side"></span>
-        <span class="bottom"></span>
-      </button>
-      <button class="small-button button" id="white-button">
-        <span class="top"></span>
-        <span class="side"></span>
-        <span class="bottom"></span>
-      </button>
-      <button class="small-button button" id="black-button">
-        <span class="top"></span>
-        <span class="side"></span>
-        <span class="bottom"></span>
-      </button>
+      {{#each smallButtons}}
+        <button class="small-button button" id="{{this}}-button">
+          <span class="top"></span>
+          <span class="side"></span>
+          <span class="bottom"></span>
+        </button>
+      {{/each}}
     </div>
   </div>
 </div>
