@@ -55,6 +55,9 @@ export class Button {
   constructor(id: ButtonId, sound: NamedSound) {
     this.el = document.getElementById(`${id}-button`) as HTMLButtonElement;
     this.el.title = sound.name ?? 'No sound';
+    const label = document.querySelector(`#${id}-button-label .label-text`);
+    console.log(label);
+    if (label) label.innerHTML = sound.name ?? '';
     this.initEvents();
     this.player = createPlayer(sound, null);
   }
