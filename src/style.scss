@@ -15,6 +15,10 @@ body {
   margin: 0;
 }
 
+* {
+  user-select: none;
+}
+
 #content {
   position: fixed;
   display: flex;
